@@ -1,0 +1,95 @@
+#' Load data frame with data information
+#' 
+#' Keep consistent names for data sets. For every X in `data_names`:
+#' - path to raw data is named `path_to_X.txt`
+#' - clean data is named `X.csv`
+#' - functions are named `read_X`
+#'
+#' @param path_to_paths_to_raw path to directory that contains paths to raw data in the form `path_to_*.txt`
+#' @param path_to_clean path to directory that contains clean data csv files
+#'
+#' @return
+#' @export
+#'
+#' @examples
+load_data_dictionary <- function(path_to_paths_to_raw = "data/paths_to_raw_data", 
+                                 path_to_clean = "data/clean") {
+  data_names = c("activity_watch_afk", 
+                 "activity_watch_web", 
+                 "activity_watch_window", 
+                 "activity_watch_vscode", 
+                 "amazfit_bip", 
+                 "kindle_clippings", 
+                 "lastfm", 
+                 "phone_recordings", 
+                 "recordings_notes", 
+                 "spotify", 
+                 "whatsapp")
+  path_to_raw = character(length(data_names))
+  functions = vector("list", length(data_names))
+  for (i in seq_along(data_names)) {
+    name = data_names[i]
+    if (grepl("activity_watch", name))
+      name = "activity_watch"
+    path = file.path(path_to_paths_to_raw, paste0("path_to_", name, ".txt"))
+    if (!file.exists(path))
+      stop(path, " does not exist.")
+    path_to_raw[i] = readLines(path)
+  }
+  
+  functions = list(function(x) read_activity_watch(x, "afk"), 
+                   function(x) read_activity_watch(x, "web"),
+                   function(x) read_activity_watch(x, "window"),
+                   function(x) read_activity_watch(x, "vscode"),
+                   read_amazfit_bip, 
+                   read_kindle_clippings, 
+                   read_lastfm, 
+                   read_phone_recordings, 
+                   read_recording_notes, 
+                   read_spotify, 
+                   read_whatsapp)
+  tibble::tibble(name = data_names, 
+                 path_to_clean = file.path(path_to_clean, paste0(data_names, ".csv")),
+                 path_to_raw = path_to_raw,
+                 prepare_raw = functions)  
+}
+
+#' Load clean data
+#' 
+#' If clean data does not exist, then
+#'
+#' @param path_to_clean 
+#' @param path_to_raw 
+#' @param prepare_raw_data 
+#'
+#' @return
+#' @export
+#'
+#' @examples
+load_clean_data <- function(path_to_clean, path_to_raw, prepare_raw_data, 
+                            force_overwrite=FALSE) {
+  has_changed = file.info(path_to_raw)$mtime > file.info(path_to_clean)$mtime
+  if (!file.exists(path_to_clean) | has_changed | force_overwrite) {
+    cat(paste0("Preparing ", path_to_raw, " ...\n"))
+    data = prepare_raw_data(path_to_raw)
+    cat(paste0("Writing ", path_to_clean, " ...\n"))
+    write.csv(data, path_to_clean, row.names = FALSE)
+  } else {
+    data = read.csv(path_to_clean, stringsAsFactors = FALSE)
+  }
+  data
+}
+
+#' Wrapper for load_clean_data
+#'
+#' @param name one of `data_names` in [load_data_dictionary]
+#'
+#' @return
+#' @export
+#'
+#' @examples
+load_clean_data_ <- function(name, force_overwrite=FALSE) {
+  d = load_data_dictionary()
+  d = d[d$name == name, ]
+  load_clean_data(d$path_to_clean, d$path_to_raw, d$prepare_raw[[1]], force_overwrite)
+}
