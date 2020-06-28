@@ -9,6 +9,26 @@ library(RSQLite)
 library(lubridate)
 library(googlesheets4)
 
+#' Read all datasets
+#' 
+#' Reads all datasets listed in [load_data_dictionary()].
+#'
+#' @return list of data frames
+#' @export
+#'
+#' @examples
+read_all <- function() {
+  data_dict = load_data_dictionary()
+  data_list = vector("list", nrow(data_dict))
+  names(data_list) = data_dict$name
+  for (i in 1:nrow(data_dict)) {
+    cat(paste0("Reading ", data_dict$name[i], "...\n"))
+    data_list[[i]] = load_clean_data_(data_dict$name[i])
+  }
+  cat(paste0("Total size: ", format(object.size(data_all), units="Mb")), "\n")
+  data_list
+}
+
 #' Read ActivityWatch data
 #' 
 #' Exported data from ActivityWatch are in json format, and contain all "buckets". 

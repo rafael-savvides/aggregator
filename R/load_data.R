@@ -23,7 +23,7 @@ load_data_dictionary <- function(path_to_paths_to_raw = "data/paths_to_raw_data"
                  "kindle_clippings", 
                  "lastfm", 
                  "phone_recordings", 
-                 "recordings_notes", 
+                 #"recordings_notes", 
                  "spotify", 
                  "whatsapp")
   path_to_raw = character(length(data_names))
@@ -49,7 +49,7 @@ load_data_dictionary <- function(path_to_paths_to_raw = "data/paths_to_raw_data"
                    read_kindle_clippings, 
                    read_lastfm, 
                    read_phone_recordings, 
-                   read_recording_notes, 
+                   #read_recording_notes, 
                    read_spotify, 
                    read_whatsapp)
   tibble::tibble(name = data_names, 
@@ -95,5 +95,6 @@ load_clean_data <- function(path_to_clean, path_to_raw, prepare_raw_data,
 load_clean_data_ <- function(name, force_overwrite=FALSE) {
   d = load_data_dictionary()
   d = d[d$name == name, ]
-  load_clean_data(d$path_to_clean, d$path_to_raw, d$prepare_raw[[1]], force_overwrite)
+  load_clean_data(d$path_to_clean, d$path_to_raw, d$prepare_raw[[1]], force_overwrite) %>% 
+    as_tibble()
 }
