@@ -19,6 +19,7 @@ load_data_dictionary <- function(path_to_paths_to_raw = "data/paths_to_raw_data"
                  "activity_watch_window", 
                  "activity_watch_vscode", 
                  "amazfit_bip", 
+                 "bank",
                  "kindle_clippings", 
                  "lastfm", 
                  "phone_recordings", 
@@ -31,6 +32,8 @@ load_data_dictionary <- function(path_to_paths_to_raw = "data/paths_to_raw_data"
     name = data_names[i]
     if (grepl("activity_watch", name))
       name = "activity_watch"
+    if (grepl("bank", name))
+      name = "bank_dir"
     path = file.path(path_to_paths_to_raw, paste0("path_to_", name, ".txt"))
     if (!file.exists(path))
       stop(path, " does not exist.")
@@ -42,6 +45,7 @@ load_data_dictionary <- function(path_to_paths_to_raw = "data/paths_to_raw_data"
                    function(x) read_activity_watch(x, "window"),
                    function(x) read_activity_watch(x, "vscode"),
                    read_amazfit_bip, 
+                   read_bank,
                    read_kindle_clippings, 
                    read_lastfm, 
                    read_phone_recordings, 
@@ -56,7 +60,7 @@ load_data_dictionary <- function(path_to_paths_to_raw = "data/paths_to_raw_data"
 
 #' Load clean data
 #' 
-#' If clean data does not exist, then
+#' If clean data does not exist, then opens raw data and saves clean data to `data/`.
 #'
 #' @param path_to_clean 
 #' @param path_to_raw 

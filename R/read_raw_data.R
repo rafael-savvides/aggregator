@@ -135,6 +135,28 @@ read_kindle_clippings <- function(path_to_txt) {
   clippings
 }
 
+#' Read bank data
+#'
+#' @param path_to_bank_dir path to directory that contains csv files starting 
+#' with "danske" and "spankki"
+#'
+#' @return data frame
+#' @export
+#'
+#' @examples
+read_bank <- function(path_to_bank_dir) {
+  danske_files = list.files(path_to_bank_dir, "danske.+\\.csv", full.names = TRUE)
+  spankki_files = list.files(path_to_bank_dir, "spankki.+\\.csv", full.names = TRUE)
+  danske = purrr::map_df(danske_files, read_danske) %>% 
+    dplyr::mutate(bank = "Danske")
+  spankki = purrr::map_df(spankki_files, read_spankki)%>% 
+    dplyr::mutate(bank = "S-Bank")
+  bank = dplyr::full_join(danske, spankki) %>% 
+    dplyr::select(-bank, dplyr::everything(), bank) %>% 
+    dplyr::arrange(dplyr::desc(date))
+  bank
+}
+
 #' Read and preprocess S-pankki csv to data frame
 #'
 #' @param path_to_csv location of csv file
@@ -160,7 +182,7 @@ read_spankki <- function(path_to_csv) {
     mutate(amount = make_numeric(amount),
            date_reported = day_month_year2date(date_reported),
            date = day_month_year2date(date_paid)) %>%
-    dplyr::select(date, amount, type, payer, receiver, message)
+    dplyr::select(date, amount, receiver, payer, message, type)
 }
 
 #' Read Danske bank data
@@ -179,7 +201,7 @@ read_danske <- function(path_to_csv) {
     mutate(payer = if_else(amount > 0, as.character(receiver_payer), "Rafael Savvides"),
            receiver = if_else(amount < 0, as.character(receiver_payer), "Rafael Savvides"),
            date = day_month_year2date(date)) %>%
-    select(date, receiver, payer, amount) %>%
+    select(date,  amount, receiver, payer) %>%
     mutate(receiver = str_replace(receiver, " +\\)\\)\\)\\)", ""))
 }
 
