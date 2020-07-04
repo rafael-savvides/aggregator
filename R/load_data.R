@@ -22,6 +22,7 @@ load_data_dictionary <- function(path_to_paths_to_raw = "data/paths_to_raw_data"
                  "bank",
                  "kindle_clippings", 
                  "lastfm", 
+                 "msn",
                  "phone_recordings", 
                  #"recordings_notes", 
                  "spotify", 
@@ -34,6 +35,8 @@ load_data_dictionary <- function(path_to_paths_to_raw = "data/paths_to_raw_data"
       name = "activity_watch"
     if (grepl("bank", name))
       name = "bank_dir"
+    if (grepl("msn", name))
+      name = "msn_dir"
     path = file.path(path_to_paths_to_raw, paste0("path_to_", name, ".txt"))
     if (!file.exists(path))
       stop(path, " does not exist.")
@@ -48,6 +51,7 @@ load_data_dictionary <- function(path_to_paths_to_raw = "data/paths_to_raw_data"
                    read_bank,
                    read_kindle_clippings, 
                    read_lastfm, 
+                   read_msn, 
                    read_phone_recordings, 
                    #read_recording_notes, 
                    read_spotify, 
