@@ -204,7 +204,7 @@ read_spankki <- function(path_to_csv) {
     mutate(amount = make_numeric(amount),
            date_reported = day_month_year2date(date_reported),
            date = day_month_year2date(date_paid)) %>%
-    dplyr::select(date, amount, receiver, payer, message, type)
+    dplyr::select(date, amount, receiver, payer, message, type, receiver_iban)
 }
 
 #' Read Danske bank data
@@ -360,7 +360,48 @@ read_daylio <- function() {
   
 }
 
-read_telegram <- function() {
+read_telegram <- function(dir_telegram) {
+  json = read_json(dir_telegram)
+  chats = json$chats$list
+  df = tibble(chat = sapply(chats, function(x) {if (is.null(x$name)) NA_character_ else x$name}), 
+              messages = sapply(chats, function(x) x$messages))
+  
+  parse_chat = function(x) {
+    parse_message = function(x) {
+      # Telegram seems to have some automatic entity identification (e.g. if 
+      # message contains link, phone number, etc). This is stored as a nested 
+      # list which complicates parsing.
+      if (!is.list(x)) 
+        return(x)
+      if (length(x) == 1 && !is.null(x[[1]]$text))
+        return(x[[1]]$text)
+      if (!is.null(x$text))
+        return(x$text)
+      if (length(x) > 1) {
+        return(paste0(sapply(x, parse_message), collapse=" "))
+      
+      return("")
+      }
+    }
+    x = tibble(chat = df$messages[[2]])
+    x_df = x %>% 
+      unnest_wider(chat) 
+    x_df %>% 
+      filter(type == "message") %>% 
+      select(-c(type, from_id, file, thumbnail, sticker_emoji, width, 
+                height, photo, actor, actor_id, action, discard_reason, 
+                location_information, live_location_period_seconds, 
+                duration_seconds, via_bot, media_type)) %>% 
+      select(from, text, date, edited, id, everything()) %>% 
+      mutate(text = map_chr(text, parse_message), 
+             content = ifelse(is.na(mime_type), 
+                              text, 
+                              paste0(ifelse(text=="", text, paste0(text, " \n")), 
+                                     "Media: ", 
+                                     mime_type))) 
+      
+
+  }
   
 }
 
@@ -406,8 +447,7 @@ read_msn <- function(path_to_msn_dir) {
     chat_html = read_html(html_files$full_path[i])
     list_of_chats[[i]] = parse_chat_html(chat_html)
   }
-  #saveRDS(list_of_chats, "data/tmp_msn_raw.rds")
-  #list_of_chats = readRDS("data/tmp_msn_raw.rds")
+  
   msn = data.frame(account = html_files$account[1:n], 
                    chat = I(list_of_chats), 
                    stringsAsFactors = FALSE) %>%
@@ -434,8 +474,46 @@ read_pocket <- function() {
   
 }
 
-read_google_keep <- function() {
+read_google_keep <- function(dir_google_keep) {
+  parse_checklist = function(x) {
+    if (is.na(x))
+      return("")
+    paste0(
+      paste0(
+        ifelse(sapply(x, function(x) x$isChecked), "[x] ", "[ ] "), 
+        sapply(x, function(x) x$text)), 
+      collapse="\n"
+    )
+  }
   
+  parse_labels = function(x) {
+    if (is.na(x))
+      return("")
+    paste0(unlist(x), collapse=",")
+  }
+  
+  parse_annotations = function(x) {
+    if (is.na(x))
+      return("")
+    x = unlist(x)
+    paste0(paste0(names(x), ": ", x), collapse=",\n")
+  }
+  df = tibble(files = list.files(dir_google_keep, pattern = "*.json", full.names = TRUE)) %>% 
+    filter(!str_detect(files, "\\?")) %>% #TODO Fix Greek encoding, ignoring for now.
+    mutate(json = map(files, read_json)) %>% 
+    unnest_wider(json) %>% 
+    mutate(filename = basename(files), 
+           timestamp_edited = as.POSIXct(userEditedTimestampUsec / 1e6, origin="1970-01-01"),
+           checklist = map_chr(listContent, parse_checklist), 
+           labels = map_chr(labels, parse_labels), 
+           annotations = map_chr(annotations, parse_annotations)) %>% 
+    rename(content = textContent, 
+           is_trashed = isTrashed, 
+           is_archived = isArchived) %>% 
+    select(-attachments, -sharees, -isPinned, -color, -files, -userEditedTimestampUsec, -listContent) %>% 
+    select(title, content, checklist, labels, annotations, timestamp_edited, everything())
+  
+  df
 }
 
 read_google_calendar <- function() {
