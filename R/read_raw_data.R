@@ -339,27 +339,14 @@ read_lastfm = function(path_to_csv) {
 }
 
 
-
-
-
-# TODO ####
-
-read_donelist <- function() {
-  
-}
-
-read_work_diary <- function() {
-  
-}
-
-read_youtube <- function() {
-  
-}
-
-read_daylio <- function() {
-  
-}
-
+#' Title
+#'
+#' @param dir_telegram 
+#'
+#' @return
+#' @export
+#'
+#' @examples
 read_telegram <- function(dir_telegram) {
   json = read_json(dir_telegram)
   chats = json$chats$list
@@ -379,8 +366,8 @@ read_telegram <- function(dir_telegram) {
         return(x$text)
       if (length(x) > 1) {
         return(paste0(sapply(x, parse_message), collapse=" "))
-      
-      return("")
+        
+        return("")
       }
     }
     x = tibble(chat = df$messages[[2]])
@@ -399,16 +386,20 @@ read_telegram <- function(dir_telegram) {
                               paste0(ifelse(text=="", text, paste0(text, " \n")), 
                                      "Media: ", 
                                      mime_type))) 
-      
-
+    
+    
   }
   
 }
 
-read_facebook_chat <- function() {
-  
-}
-
+#' Title
+#'
+#' @param path_to_msn_dir 
+#'
+#' @return
+#' @export
+#'
+#' @examples
 read_msn <- function(path_to_msn_dir) {
   parse_chat_html <- function(chat_html) {
     parse_chat_text <- function(chat_text) {
@@ -466,17 +457,17 @@ read_msn <- function(path_to_msn_dir) {
   msn
 }
 
-read_feedly <- function() {
-  
-}
-
-read_pocket <- function() {
-  
-}
-
+#' Title
+#'
+#' @param dir_google_keep 
+#'
+#' @return
+#' @export
+#'
+#' @examples
 read_google_keep <- function(dir_google_keep) {
   parse_checklist = function(x) {
-    if (is.na(x))
+    if (is.null(x) || is.na(x))
       return("")
     paste0(
       paste0(
@@ -487,13 +478,13 @@ read_google_keep <- function(dir_google_keep) {
   }
   
   parse_labels = function(x) {
-    if (is.na(x))
+    if (is.null(x) || is.na(x))
       return("")
     paste0(unlist(x), collapse=",")
   }
   
   parse_annotations = function(x) {
-    if (is.na(x))
+    if (is.null(x) || is.na(x))
       return("")
     x = unlist(x)
     paste0(paste0(names(x), ": ", x), collapse=",\n")
@@ -516,11 +507,45 @@ read_google_keep <- function(dir_google_keep) {
   df
 }
 
-read_google_calendar <- function() {
+# TODO ####
+
+read_donelist <- function() {
   
 }
 
+read_work_diary <- function() {
+  
+}
+
+read_youtube <- function() {
+  
+}
+
+read_daylio <- function() {
+  
+}
+
+read_facebook_chat <- function() {
+  
+}
+
+read_google_calendar <- function() {
+  # How to read .ics files?  
+}
+
 read_google_chrome_history <- function() {
+  
+}
+
+read_app_usage <- function() {
+  
+}
+
+read_daylio <- function() {
+  
+}
+
+read_phone_activity <- function() {
   
 }
 
