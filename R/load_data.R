@@ -20,15 +20,16 @@ load_data_dictionary <- function(path_to_paths_to_raw = "data/paths_to_raw_data"
                  "activity_watch_vscode", 
                  "amazfit_bip", 
                  "bank",
+                 "google_keep",
                  "kindle_clippings", 
                  "lastfm", 
                  "msn",
                  "phone_recordings", 
                  #"recordings_notes", 
                  "spotify", 
-                 "whatsapp")
+                 "telegram",
+                 "whatsapp") # If a name is added here, add a function for it below..
   path_to_raw = character(length(data_names))
-  functions = vector("list", length(data_names))
   for (i in seq_along(data_names)) {
     name = data_names[i]
     if (grepl("activity_watch", name))
@@ -37,25 +38,36 @@ load_data_dictionary <- function(path_to_paths_to_raw = "data/paths_to_raw_data"
       name = "bank_dir"
     if (grepl("msn", name))
       name = "msn_dir"
+    if (grepl("google_keep", name))
+      name = "google_keep_dir"
     path = file.path(path_to_paths_to_raw, paste0("path_to_", name, ".txt"))
     if (!file.exists(path))
       stop(path, " does not exist.")
     path_to_raw[i] = readLines(path)
   }
   
-  functions = list(function(x) read_activity_watch(x, "afk"), 
-                   function(x) read_activity_watch(x, "web"),
-                   function(x) read_activity_watch(x, "window"),
-                   function(x) read_activity_watch(x, "vscode"),
-                   read_amazfit_bip, 
-                   read_bank,
-                   read_kindle_clippings, 
-                   read_lastfm, 
-                   read_msn, 
-                   read_phone_recordings, 
-                   #read_recording_notes, 
-                   read_spotify, 
-                   read_whatsapp)
+  functions = vector("list", length(data_names)) 
+  for (i in seq_along(data_names)) {
+    name = data_names[i]
+    functions[[i]] = get(paste0("read_", name))
+  }
+  #FIXED I think.
+  #FIXME This is too brittle... The order of the functions has to be the same as `data_names`.
+  # functions = list(function(x) read_activity_watch(x, "afk"), 
+  #                  function(x) read_activity_watch(x, "web"),
+  #                  function(x) read_activity_watch(x, "window"),
+  #                  function(x) read_activity_watch(x, "vscode"),
+  #                  read_amazfit_bip, 
+  #                  read_bank,
+  #                  read_google_keep,
+  #                  read_kindle_clippings, 
+  #                  read_lastfm, 
+  #                  read_msn, 
+  #                  read_phone_recordings, 
+  #                  #read_recording_notes, 
+  #                  read_spotify, 
+  #                  read_telegram,
+  #                  read_whatsapp)
   tibble::tibble(name = data_names, 
                  path_to_clean = file.path(path_to_clean, paste0(data_names, ".csv")),
                  path_to_raw = path_to_raw,

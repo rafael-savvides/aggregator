@@ -86,6 +86,11 @@ read_activity_watch <- function(path_to_json,
   }
 }
 
+read_activity_watch_afk = function(path_to_json) read_activity_watch(path_to_json=path_to_json, which="afk")
+read_activity_watch_window = function(path_to_json) read_activity_watch(path_to_json=path_to_json, which="window")
+read_activity_watch_web = function(path_to_json) read_activity_watch(path_to_json=path_to_json, which="web")
+read_activity_watch_vscode = function(path_to_json) read_activity_watch(path_to_json=path_to_json, which="vscode")
+
 #' Read data from Xiaomi Amazfit Bip smartwatch
 #' 
 #'
