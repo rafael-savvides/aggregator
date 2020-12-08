@@ -1,3 +1,5 @@
+library(magrittr) # Needed only for %$%, consider removing.
+
 #' Make a string a valid filename
 #'
 #' @param x string

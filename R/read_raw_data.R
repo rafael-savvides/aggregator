@@ -25,7 +25,7 @@ read_all <- function() {
   names(data_list) = data_dict$name
   for (i in 1:nrow(data_dict)) {
     cat(paste0("Reading ", data_dict$name[i], "...\n"))
-    data_list[[i]] = load_clean_data_wrapper(data_dict$name[i])
+    data_list[[i]] = load_(data_dict$name[i])
   }
   cat(paste0("Total size: ", format(object.size(data_all), units="Mb")), "\n")
   data_list
