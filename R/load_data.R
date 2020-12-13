@@ -20,6 +20,7 @@ load_data_dictionary <- function(path_to_paths_to_raw = "data/paths_to_raw_data"
                  "activity_watch_vscode", 
                  "amazfit_bip", 
                  "bank",
+                 "daylio",
                  "google_keep",
                  "kindle_clippings", 
                  "lastfm", 
