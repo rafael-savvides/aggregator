@@ -13,7 +13,8 @@
 #'
 #' @examples
 load_data_dictionary <- function(path_to_paths_to_raw = "data/paths_to_raw_data", 
-                                 path_to_clean = "data/clean") {
+                                 path_to_clean = "data/clean", 
+                                 fail_silently = FALSE) {
   data_names = c("activity_watch_afk", 
                  "activity_watch_web", 
                  "activity_watch_window", 
@@ -21,6 +22,7 @@ load_data_dictionary <- function(path_to_paths_to_raw = "data/paths_to_raw_data"
                  "amazfit_bip", 
                  "bank",
                  "daylio",
+                 "donelist",
                  "google_keep",
                  "kindle_clippings", 
                  "lastfm", 
@@ -29,10 +31,14 @@ load_data_dictionary <- function(path_to_paths_to_raw = "data/paths_to_raw_data"
                  #"recordings_notes", 
                  "spotify", 
                  "telegram",
-                 "whatsapp") # If a name is added here, add a function for it below..
+                 "whatsapp", 
+                 "work_diary_hours", 
+                 "work_diary_tasks") 
   path_to_raw = character(length(data_names))
   for (i in seq_along(data_names)) {
     name = data_names[i]
+    #functions[[i]] = get(paste0("read_", name)) #TODO Would this work?
+    
     if (grepl("activity_watch", name))
       name = "activity_watch"
     if (grepl("bank", name))
@@ -41,10 +47,19 @@ load_data_dictionary <- function(path_to_paths_to_raw = "data/paths_to_raw_data"
       name = "msn_dir"
     if (grepl("google_keep", name))
       name = "google_keep_dir"
+    if (grepl("work_diary", name))
+      name = "work_diary"
     path = file.path(path_to_paths_to_raw, paste0("path_to_", name, ".txt"))
-    if (!file.exists(path))
-      stop(path, " does not exist.")
-    path_to_raw[i] = readLines(path)
+    if (file.exists(path)) {
+      path_to_raw[i] = readLines(path)
+    } else {
+      if (!fail_silently) {
+        stop(path, " does not exist.")
+      } else {
+        #TODO clean this up. I want to be able to silently ignore missing files, and return only the ones that exist.
+        path_to_raw[i] = NA
+      }
+    } 
   }
   
   functions = vector("list", length(data_names)) 
@@ -52,23 +67,7 @@ load_data_dictionary <- function(path_to_paths_to_raw = "data/paths_to_raw_data"
     name = data_names[i]
     functions[[i]] = get(paste0("read_", name))
   }
-  #FIXED I think.
-  #FIXME This is too brittle... The order of the functions has to be the same as `data_names`.
-  # functions = list(function(x) read_activity_watch(x, "afk"), 
-  #                  function(x) read_activity_watch(x, "web"),
-  #                  function(x) read_activity_watch(x, "window"),
-  #                  function(x) read_activity_watch(x, "vscode"),
-  #                  read_amazfit_bip, 
-  #                  read_bank,
-  #                  read_google_keep,
-  #                  read_kindle_clippings, 
-  #                  read_lastfm, 
-  #                  read_msn, 
-  #                  read_phone_recordings, 
-  #                  #read_recording_notes, 
-  #                  read_spotify, 
-  #                  read_telegram,
-  #                  read_whatsapp)
+ 
   tibble::tibble(name = data_names, 
                  path_to_clean = file.path(path_to_clean, paste0(data_names, ".csv")),
                  path_to_raw = path_to_raw,
