@@ -1,0 +1,33 @@
+---
+title: "R Notebook"
+output: html_notebook
+editor_options: 
+  chunk_output_type: inline
+---
+
+
+```{r}
+source("../scripts/init.R", chdir=TRUE) 
+work_diary_tasks = load_("work_diary_tasks", data_dict)
+work_diary_hours = load_("work_diary_hours", data_dict)
+```
+
+```{r}
+tasks_by_word = work_diary_tasks %>% 
+  filter(value != "") %>% 
+  mutate(value = str_to_lower(value)) %>% 
+  separate_rows(value) 
+```
+
+
+```{r}
+tasks_by_word %>% 
+  group_by(time) %>% 
+  count(value, sort=TRUE)
+```
+```{r}
+tasks_by_word %>% 
+  group_by(date) %>% 
+  count(value, sort=TRUE)
+```
+

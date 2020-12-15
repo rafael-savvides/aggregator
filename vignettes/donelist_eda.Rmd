@@ -1,0 +1,51 @@
+---
+title: "donelist EDA"
+output: html_notebook
+---
+
+
+```{r}
+source("../scripts/init.R", chdir=TRUE) 
+donelist = load_("donelist", data_dict)
+```
+
+
+```{r}
+social = donelist %>% 
+    select(date, Social) %>% 
+    separate_rows(Social, sep="; ?") %>% 
+    separate(Social, c("activity", "people"), sep = ": ?") %>% 
+    separate_rows(people, sep=", ?") %>% 
+    separate_rows(activity, sep=", ?") %>% 
+    rename(person = people)
+  
+social %>% 
+  filter(!is.na(person)) %>% 
+  count(activity, person, sort=TRUE)
+```
+
+```{r}
+donelist %>% 
+  filter(Exercise != "") %>% 
+  count(Exercise, sort=TRUE)
+```
+
+```{r fig.height=15}
+library(ggrepel)
+
+donelist %>% 
+  select(date, Video) %>% 
+  separate_rows(Video, sep="; ?") %>% 
+  mutate(date = as.Date(date), 
+         y = cumsum(ifelse(Video != "", 1, 0)), 
+         y = ifelse(Video == "", NA, y)) %>% 
+  ggplot() + theme_minimal() +
+  geom_point(aes(x=date, y=y)) + 
+  geom_text_repel(aes(x=date, y=y, label=Video)) + 
+  scale_x_date(name="",
+               date_breaks = "2 weeks", 
+               date_labels = "%b %d", 
+               limits = as.Date(c("2020-01-01", "2020-12-31"))) + 
+  scale_y_continuous(name="", breaks = NULL, labels = NULL)
+```
+
