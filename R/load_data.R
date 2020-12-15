@@ -109,9 +109,8 @@ load_clean_data <- function(path_to_clean, path_to_raw, prepare_raw_data,
 #' @export
 #'
 #' @examples
-load_ <- function(name, force_overwrite=FALSE) {
-  d = load_data_dictionary()
-  d = d[d$name == name, ]
+load_ <- function(name, data_dict = load_data_dictionary(), force_overwrite=FALSE) {
+  d = data_dict[data_dict$name == name, ]
   load_clean_data(d$path_to_clean, d$path_to_raw, d$prepare_raw[[1]], force_overwrite) %>% 
     as_tibble()
 }
