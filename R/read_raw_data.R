@@ -462,7 +462,7 @@ read_msn <- function(path_to_msn_dir) {
   msn
 }
 
-#' Title
+#' Read Google Keep
 #'
 #' @param dir_google_keep 
 #'
@@ -536,15 +536,60 @@ read_daylio <- function(path_to_daylio, format = c("long", "wide")) {
   if (format == "wide") daylio else daylio_long
 }
 
+
+
+#' Read donelist
+#'
+#' @param path_to_donelist 
+#'
+#' @return
+#' @export
+#'
+#' @examples
+read_donelist <- function(path_to_donelist) {
+  donelist = read.csv(path_to_donelist, stringsAsFactors = FALSE) %>% 
+    mutate(date = as.Date(paste0(2020, Date), format="%Y%b%d")) %>% 
+    select(-Week, -Day, -Date) %>% 
+    select(date, everything())
+  
+  donelist
+}
+
+#' Read work diary
+#'
+#' @param path_to_work_diary 
+#' @param format one of c("tasks", "hours")
+#'
+#' @return
+#' @export
+#'
+#' @examples
+read_work_diary <- function(path_to_work_diary, which=c("tasks", "hours")) {
+ work_diary = read.csv(path_to_work_diary, skip=1) %>% 
+   as_tibble() %>% 
+   pivot_longer(-1, names_to = "date") %>% 
+   mutate(date = as.Date(paste0(2020, date), format = "%Y%b.%d")) %>% 
+   select(date, everything()) %>% 
+   arrange(date)
+ 
+ work_hours = work_diary %>% 
+   filter(!str_detect(X, "^\\d\\d?:\\d\\d"), 
+          !str_detect(X, "^Extra hours"), 
+          X != "") %>% 
+   pivot_wider(date, X) %>% 
+   janitor::clean_names()
+   
+ work_tasks = work_diary %>% 
+   filter(str_detect(X, "^\\d\\d?:\\d\\d") | str_detect(X, "^Extra hours")) %>% 
+   rename(time = X)
+ 
+ if (match.arg(which) == "tasks") work_tasks else work_hours
+}
+
+read_work_diary_hours = function(path_to_work_diary) read_work_diary(path_to_work_diary=path_to_work_diary, which="hours")
+read_work_diary_tasks = function(path_to_work_diary) read_work_diary(path_to_work_diary=path_to_work_diary, which="tasks")
+
 # TODO ####
-
-read_donelist <- function() {
-  
-}
-
-read_work_diary <- function() {
-  
-}
 
 read_youtube <- function() {
   
@@ -563,10 +608,6 @@ read_google_chrome_history <- function() {
 }
 
 read_app_usage <- function() {
-  
-}
-
-read_daylio <- function() {
   
 }
 
