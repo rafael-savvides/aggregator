@@ -227,7 +227,8 @@ read_danske <- function(path_to_csv) {
             stringsAsFactors = FALSE) %>%
     mutate(payer = if_else(amount > 0, as.character(receiver_payer), "Rafael Savvides"),
            receiver = if_else(amount < 0, as.character(receiver_payer), "Rafael Savvides"),
-           date = day_month_year2date(date)) %>%
+           date = day_month_year2date(date), 
+           amount = as.numeric(amount)) %>%
     select(date,  amount, receiver, payer) %>%
     mutate(receiver = str_replace(receiver, " +\\)\\)\\)\\)", ""))
 }
