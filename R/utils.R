@@ -1,4 +1,5 @@
 library(magrittr) # Needed only for %$%, consider removing.
+library(stringr)
 
 #' Make a string a valid filename
 #'
@@ -69,4 +70,23 @@ save_gkeep_to_md <- function(gkeep, folder = "mdnotes") {
            filename = paste0(folder, "/", map_chr(title, make_valid_filename), ".md")) %>% 
     select(md, filename) %$% 
     walk2(.x=md, .y=filename, .f = write_file, append = TRUE)
+}
+
+#' Get tags
+#'
+#' @param x char or char vector
+#' @param entities char vector of terms to match in `x`
+#' @param tags char vector of descriptions for each element of `entities`
+#'
+#' @return char vector of `|`-separated tags for each element of `x`
+#' @export
+#'
+#' @examples
+get_tags <- function(x, entities, tags) {
+  out = character(length(x))
+  for (i in seq_along(x)) {
+    s = x[i]
+    out[i] = paste0(tags[stringr::str_detect(s, entities)], collapse="|")
+  }
+  out
 }
