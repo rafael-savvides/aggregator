@@ -602,6 +602,7 @@ read_facebook_chat <- function() {
 
 read_google_calendar <- function() {
   # How to read .ics files?  
+  # See https://stackoverflow.com/questions/43573982/how-to-import-ical-ics-file-in-r
 }
 
 read_google_chrome_history <- function() {
