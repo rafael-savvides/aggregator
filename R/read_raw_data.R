@@ -612,7 +612,17 @@ read_app_usage <- function() {
   
 }
 
-read_phone_activity <- function() {
+read_phone_activity <- function(path_to_phone_activity) {
+  # I dont know where this came from but it is as detailed as I wanted.
+  phone = read.csv(path_to_phone_activity, stringsAsFactors = FALSE) %>% 
+    as_tibble() %>% 
+    janitor::clean_names() %>% 
+    mutate(duration = (end_time - start_time) / 1e3, 
+           display_name = as.factor(display_name), 
+           start_time = as.POSIXct(formatted_start_time, format="%H:%M:%S (%d-%B-%Y)"), 
+           end_time = as.POSIXct(formatted_end_time, format="%H:%M:%S (%d-%B-%Y)")) %>% 
+    select(-package_name, -usage, -formatted_start_time, -formatted_end_time)
+  
+  phone 
   
 }
-
