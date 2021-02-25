@@ -20,6 +20,7 @@ load_data_dictionary <- function(path_to_paths_to_raw = "data/paths_to_raw_data"
                  "activity_watch_window", 
                  "activity_watch_vscode", 
                  "amazfit_bip", 
+                 "app_usage", 
                  "bank",
                  "daylio",
                  "donelist",
@@ -52,6 +53,8 @@ load_data_dictionary <- function(path_to_paths_to_raw = "data/paths_to_raw_data"
       name = "work_diary"
     if (grepl("facebook_chat", name))
       name = "facebook_dir"
+    if (grepl("app_usage", name))
+      name = "app_usage_dir"
     path = file.path(path_to_paths_to_raw, paste0("path_to_", name, ".txt"))
     if (file.exists(path)) {
       path_to_raw[i] = readLines(path)

@@ -599,8 +599,14 @@ read_work_diary <- function(path_to_work_diary, which=c("tasks", "hours")) {
 read_work_diary_hours = function(path_to_work_diary) read_work_diary(path_to_work_diary=path_to_work_diary, which="hours")
 read_work_diary_tasks = function(path_to_work_diary) read_work_diary(path_to_work_diary=path_to_work_diary, which="tasks")
 
-# TODO ####
-
+#' Read youtube watch history
+#'
+#' @param path_to_youtube 
+#'
+#' @return
+#' @export
+#'
+#' @examples
 read_youtube <- function(path_to_youtube) {
   fromJSON(path_to_youtube) %>% 
     as_tibble() %>% 
@@ -609,6 +615,14 @@ read_youtube <- function(path_to_youtube) {
     select(title, url=titleUrl, timestamp) 
 }
 
+#' Read all Facebook chats
+#'
+#' @param path_to_fb_dir 
+#'
+#' @return
+#' @export
+#'
+#' @examples
 read_facebook_chat <- function(path_to_fb_dir) {
   parse_messages = function(messages) {
     # messages = fromJSON(fbchat)$messages
@@ -663,16 +677,71 @@ read_facebook_chat <- function(path_to_fb_dir) {
     unnest(messages)
 }
 
-read_google_calendar <- function() {
+#' Read smartphone app usage
+#'
+#' @param path_to_app_usage_dir 
+#'
+#' @return
+#' @export
+#'
+#' @examples
+read_app_usage = function(path_to_app_usage_dir) {
+  make_secs = function(s) { 
+    # Converts '0:01:44' to 104 seconds.
+    s = as.numeric(strsplit(s, ":")[[1]])
+    s[1]*3600 + s[2]*60 + s[3]
+  }
+  read_one_app_usage_file = function(file) {
+    read.csv(file) %>% 
+      as_tibble() %>% 
+      mutate(timestamp = strptime(paste(Date, Time), format="%m/%d/%y %H:%M:%S"), 
+             duration = map_dbl(Duration, make_secs)) %>% 
+      select(app=App.name, timestamp, duration)
+  }
+
+  files = list.files(path_to_app_usage_dir, full.names = TRUE)
+  map_df(files, read_one_app_usage_file)
+}
+
+# TODO ####
+
+read_google_calendar <- function(path_to_google_calendar) {
   # How to read .ics files?  
   # See https://stackoverflow.com/questions/43573982/how-to-import-ical-ics-file-in-r
+  path_to_google_calendar = readLines("data/paths_to_raw_data/path_to_google_calendar.txt")
+  x = readLines(path_to_google_calendar, warn = FALSE)
+  
+  # Lines that start with space are continuations from previous line.
+  for (i in seq.int(length(x), 2)) {
+    if (grepl("^\\s", x[i])) {
+      x[i-1] = paste0(x[i-1], substring(x[i], 2)) # Remove indentation
+      x[i] = NA
+    }
+  }
+  x = x[!is.na(x)]
+  field_regex = "^[\\w-;=/]+:" # ATTENDEE and ORGANIZER fields are not parsed
+  tibble(x=x, 
+         is_begin_event = str_detect(x, "^BEGIN:VEVENT"), 
+         is_end_event = str_detect(x, "^END:VEVENT"), 
+         id = cumsum(is_begin_event), 
+         has_colon = str_detect(x, field_regex)) %>% 
+    mutate(field = ifelse(has_colon, str_extract(x, field_regex), NA), 
+           content = ifelse(has_colon, str_extract(x, ":.+"), NA)) %>% 
+    filter(!is.na(field)) %>% 
+    select(field, content, id) %>% 
+    group_by(id) %>% 
+    pivot_wider(names_from=field, values_from=content)
+    summarize(text = list(x)) #TODO
+  parse_entry = function(x) {
+    #TODO
+  }
+  
+  df
 }
 
 read_google_chrome_history <- function() {
-  
-}
-
-read_app_usage <- function() {
+  # https://www.foxtonforensics.com/browser-history-examiner/chrome-history-location
+  # Chrome Website Visits are stored in the 'History' SQLite database, within the 'visits' table. Associated URL information is stored within the 'urls' table. Older versions of Chrome stored archived Website Visits in a separate 'Archived History' SQLite database, within the 'visits' table. 
   
 }
 
@@ -688,5 +757,9 @@ read_phone_activity <- function(path_to_phone_activity) {
     select(-package_name, -usage, -formatted_start_time, -formatted_end_time)
   
   phone 
+  
+}
+
+read_firefox_history <- function() {
   
 }
