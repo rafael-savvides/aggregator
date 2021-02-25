@@ -96,7 +96,7 @@ load_clean_data <- function(path_to_clean, path_to_raw, prepare_raw_data,
     cat(paste0("Preparing ", path_to_raw, " ...\n"))
     data = prepare_raw_data(path_to_raw)
     cat(paste0("Writing ", path_to_clean, " ...\n"))
-    write.csv(data, path_to_clean, row.names = FALSE)
+    write.csv(data, path_to_clean, row.names = FALSE, fileEncoding = "UTF-8")
   } else {
     data = read.csv(path_to_clean, stringsAsFactors = FALSE)
   }
