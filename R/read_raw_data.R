@@ -592,8 +592,12 @@ read_work_diary_tasks = function(path_to_work_diary) read_work_diary(path_to_wor
 
 # TODO ####
 
-read_youtube <- function() {
-  
+read_youtube <- function(path_to_youtube) {
+  fromJSON(path_to_youtube) %>% 
+    as_tibble() %>% 
+    mutate(title = str_remove(title, "^Watched ")) %>% 
+    mutate(timestamp = strptime(time, format = "%Y-%m-%dT%H:%M:%S")) %>% 
+    select(title, url=titleUrl, timestamp) 
 }
 
 read_facebook_chat <- function() {
