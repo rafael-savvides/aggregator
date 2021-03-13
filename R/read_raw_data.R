@@ -703,6 +703,63 @@ read_app_usage = function(path_to_app_usage_dir) {
   map_df(files, read_one_app_usage_file)
 }
 
+#' Read Mozzila Firefox history
+#'
+#' @param path_to_firefox_history_db path to places.sqlite
+#'
+#' @return
+#' @export
+#'
+#' @examples
+read_firefox_history <- function(path_to_firefox_history_db) {
+  con = DBI::dbConnect(RSQLite::SQLite(), path_to_firefox_history_db)
+  history = dbReadTable(con, "moz_historyvisits") %>% 
+    as_tibble()
+  
+  places = dbReadTable(con, "moz_places") %>% 
+    as_tibble()
+  
+  df = left_join(history, places, by=c("place_id"="id")) %>% 
+    select(place_id, visit_date, url, title, origin_id, visit_count) %>% 
+    # UNIX timestamp is in microseconds
+    mutate(visit_date = as.POSIXct(visit_date / 1e6, origin="1970-01-01"), 
+           domain = urltools::domain(url), 
+           title = ifelse(is.na(title), "", title)) 
+  dbDisconnect(con)
+  df
+}
+
+#' Read Google Chrome history
+#' 
+#' Note: Google Chrome stores only the last 90 days of browsing history... 
+#' Some more is in https://history.google.com/, but I disabled that in 2019.
+#'
+#' @param path_to_chrome_history_db 
+#'
+#' @return
+#' @export
+#'
+#' @examples
+read_chrome_history <- function(path_to_chrome_history_db) {
+  con = DBI::dbConnect(RSQLite::SQLite(), path_to_chrome_history_db)
+  
+  visits = dbReadTable(con, "visits") %>% 
+    as_tibble()
+  
+  urls = dbReadTable(con, "urls") %>% 
+    as_tibble()
+  
+  df = left_join(visits, urls, by=c("url"="id")) %>% 
+    select(url_id=url, visit_time, url=url.y, title, visit_duration) %>% 
+    # UNIX timestamp is in microseconds.
+    # The Win32 epoch January 1, 1601.
+    mutate(visit_time = as.POSIXct(visit_time / 1e6, origin="1601-01-01"), 
+           domain = urltools::domain(url), 
+           title = ifelse(is.na(title), "", title)) 
+  dbDisconnect(con)
+  df
+}
+
 # TODO ####
 
 read_google_calendar <- function(path_to_google_calendar) {
@@ -739,11 +796,6 @@ read_google_calendar <- function(path_to_google_calendar) {
   df
 }
 
-read_google_chrome_history <- function() {
-  # https://www.foxtonforensics.com/browser-history-examiner/chrome-history-location
-  # Chrome Website Visits are stored in the 'History' SQLite database, within the 'visits' table. Associated URL information is stored within the 'urls' table. Older versions of Chrome stored archived Website Visits in a separate 'Archived History' SQLite database, within the 'visits' table. 
-  
-}
 
 read_phone_activity <- function(path_to_phone_activity) {
   # I dont know where this came from but it is as detailed as I wanted.
@@ -760,6 +812,3 @@ read_phone_activity <- function(path_to_phone_activity) {
   
 }
 
-read_firefox_history <- function() {
-  
-}
