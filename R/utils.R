@@ -90,3 +90,21 @@ get_tags <- function(x, entities, tags) {
   }
   out
 }
+
+#' Find self payments 
+#' A self payment is where the payer and receiver are the same.
+#'
+#' @param receiver 
+#' @param payer 
+#' @param name 
+#'
+#' @return logical
+#' @export
+#'
+#' @examples
+is_self_payment = function(receiver, payer, name) {
+  r = tolower(receiver)
+  p = tolower(payer)
+  name = tolower(strsplit(name, " ")[[1]])
+  grepl(name[1], r) & grepl(name[2], r) & grepl(name[1], p) & grepl(name[2], p)
+}
