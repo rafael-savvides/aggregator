@@ -9,7 +9,7 @@ library(RSQLite)
 library(lubridate)
 library(googlesheets4)
 library(rvest)
-
+library(readxl)
 
 #' Read all datasets
 #' 
@@ -254,22 +254,24 @@ read_phone_recordings = function(path_to_dir) {
     select(file, phone, timestamp, abs_filename)
 }
 
-#' Read Google Sheet with recording notes
+#' Read xlsx with recording notes
 #' 
-#' Wrapper for using read_sheet without authorization. 
 #'
-#' @param sheet_url URL to a non-private Google Sheet
-#' @param tab worksheet in sheet (as string or as integer position)
+#' @param path_to_recording_notes 
+#' @param sheet 
 #'
 #' @return
 #' @export
-#' @seealso  https://github.com/mbannert/boar-2018/issues/1
 #' @examples
-read_recording_notes <- function(sheet_url, tab=1) {
-  googlesheets4::sheets_deauth()
-  googlesheets4::read_sheet(ss = sheet_url, sheet=tab)
+read_recordings_notes <- function(path_to_recording_notes, sheet=1) {
+  col_types = NULL
+  if (sheet == "phone")
+    col_types = c("text", "numeric", "text", "text", "text", "text", "numeric")
+  
+  read_excel(path_to_recording_notes, sheet=sheet, col_types = col_types)
 }
 
+read_recordings_notes_phone = function(path) read_recording_notes(path, sheet="phone")
 
 
 #' Read Whatsapp chat

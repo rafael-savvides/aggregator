@@ -31,6 +31,7 @@ load_data_dictionary <- function(path_to_paths_to_raw = "data/paths_to_raw_data"
                  "lastfm", 
                  "msn",
                  "phone_recordings", 
+                 "recordings_notes_phone", 
                  "spotify", 
                  "telegram",
                  "whatsapp", 
@@ -55,6 +56,8 @@ load_data_dictionary <- function(path_to_paths_to_raw = "data/paths_to_raw_data"
       name = "facebook_dir"
     if (grepl("app_usage", name))
       name = "app_usage_dir"
+    if (grepl("recordings_notes", name))
+      name = "recordings_notes"
     path = file.path(path_to_paths_to_raw, paste0("path_to_", name, ".txt"))
     if (file.exists(path)) {
       path_to_raw[i] = readLines(path)
