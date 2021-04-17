@@ -11,7 +11,7 @@ library(lubridate)
 #' @export
 #'
 #' @examples
-read_spotify = function(path_to_json = readlines("data-raw/path_to_spotify.txt")) {
+read_spotify = function(path_to_json = readLines("data-raw/path_to_spotify.txt")) {
   read_json(path_to_json, simplifyVector = T) %>% 
     mutate(endTime = ymd_hm(endTime)) %>% 
     rename(timestamp = endTime, artist = artistName, song = trackName, ms_played = msPlayed)
@@ -19,4 +19,4 @@ read_spotify = function(path_to_json = readlines("data-raw/path_to_spotify.txt")
 
 spotify = read_spotify()
 
-save(spotify, "data/spotify.rda")
+save(spotify, file="data/spotify.rda")

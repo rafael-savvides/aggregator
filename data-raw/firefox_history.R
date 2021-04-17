@@ -11,7 +11,7 @@ library(tidyr)
 #' @export
 #'
 #' @examples
-read_firefox_history <- function(path_to_firefox_history_db = readlines("data-raw/path_to_firefox_history.txt")) {
+read_firefox_history <- function(path_to_firefox_history_db = readLines("data-raw/path_to_firefox_history.txt")) {
   con = DBI::dbConnect(RSQLite::SQLite(), path_to_firefox_history_db)
   history = dbReadTable(con, "moz_historyvisits") %>% 
     as_tibble()
@@ -31,4 +31,4 @@ read_firefox_history <- function(path_to_firefox_history_db = readlines("data-ra
 
 firefox_history = read_firefox_history()
 
-save(firefox_history, "data/firefox_history.rda")
+save(firefox_history, file="data/firefox_history.rda")

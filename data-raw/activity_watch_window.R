@@ -12,7 +12,7 @@ library(tidyr)
 #' @export
 #'
 #' @examples
-read_activity_watch_window <- function(path_to_json = readlines("data-raw/path_to_activity_watch.txt")) {
+read_activity_watch_window <- function(path_to_json = readLines("data-raw/path_to_activity_watch.txt")) {
     buckets = jsonlite::read_json(path_to_json)[[1]] %>% 
     tibble(watchers = .) %>% 
     unnest_wider(watchers)
@@ -27,4 +27,4 @@ read_activity_watch_window <- function(path_to_json = readlines("data-raw/path_t
 
 activity_watch_window = read_activity_watch_window()
 
-save(activity_watch_window, "data/activity_watch_window.rda")
+save(activity_watch_window, file="data/activity_watch_window.rda")

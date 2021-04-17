@@ -1,6 +1,7 @@
 library(jsonlite)
 library(dplyr)
 library(tidyr)
+library(stringr)
 
 #' Read ActivityWatch data
 #' 
@@ -12,7 +13,7 @@ library(tidyr)
 #' @export
 #'
 #' @examples
-read_activity_watch_afk <- function(path_to_json = readlines("data-raw/path_to")) {
+read_activity_watch_afk <- function(path_to_json = readLines("data-raw/path_to_activity_watch.txt")) {
     buckets = jsonlite::read_json(path_to_json)[[1]] %>% 
     tibble(watchers = .) %>% 
     unnest_wider(watchers)
@@ -25,6 +26,6 @@ read_activity_watch_afk <- function(path_to_json = readlines("data-raw/path_to")
     afk
 }
 
-activity_watch_afk = read_activity_watch_afk(paths$activity_watch)
+activity_watch_afk = read_activity_watch_afk()
 
-save(activity_watch_afk, "data/activity_watch_afk.rda")
+save(activity_watch_afk, file="data/activity_watch_afk.rda")

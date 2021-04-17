@@ -11,7 +11,7 @@ library(stringr)
 #' @export
 #'
 #' @examples
-read_work_diary <- function(path_to_work_diary = readlines("data-raw/path_to_work_diary.txt"), which=c("tasks", "hours")) {
+read_work_diary_tasks <- function(path_to_work_diary = readLines("data-raw/path_to_work_diary.txt"), which=c("tasks", "hours")) {
  work_diary = read.csv(path_to_work_diary, skip=1) %>% 
    as_tibble() %>% 
    pivot_longer(-1, names_to = "date") %>% 
@@ -28,4 +28,4 @@ read_work_diary <- function(path_to_work_diary = readlines("data-raw/path_to_wor
 
 work_diary_tasks = read_work_diary_tasks()
 
-save(work_diary_tasks, "data/work_diary_tasks.rda")
+save(work_diary_tasks, file="data/work_diary_tasks.rda")

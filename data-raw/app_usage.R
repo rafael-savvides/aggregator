@@ -9,7 +9,7 @@ library(purrr)
 #' @export
 #'
 #' @examples
-read_app_usage = function(path_to_app_usage_dir = readlines("data-raw/path_to_app_usage.txt")) {
+read_app_usage = function(path_to_app_usage_dir = readLines("data-raw/path_to_app_usage_dir.txt")) {
   make_secs = function(s) { 
     # Converts '0:01:44' to 104 seconds.
     s = as.numeric(strsplit(s, ":")[[1]])
@@ -29,4 +29,4 @@ read_app_usage = function(path_to_app_usage_dir = readlines("data-raw/path_to_ap
 
 app_usage = read_app_usage()
 
-save(app_usage, "data/app_usage.rda")
+save(app_usage, file="data/app_usage.rda")

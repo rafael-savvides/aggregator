@@ -11,7 +11,7 @@ library(rvest)
 #' @export
 #'
 #' @examples
-read_msn <- function(path_to_msn_dir = readlines("data-raw/path_to_msn_dir.txt")) {
+read_msn <- function(path_to_msn_dir = readLines("data-raw/path_to_msn_dir.txt")) {
   parse_chat_html <- function(chat_html) {
     parse_chat_text <- function(chat_text) {
       chat_text %>% 
@@ -71,4 +71,4 @@ read_msn <- function(path_to_msn_dir = readlines("data-raw/path_to_msn_dir.txt")
 
 msn = read_msn()
 
-save(msn, "data/msn.rda")
+save(msn, file="data/msn.rda")

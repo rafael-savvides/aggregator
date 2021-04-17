@@ -10,7 +10,7 @@ library(lubridate)
 #' @export
 #'
 #' @examples
-read_lastfm = function(path_to_csv = readlines("data-raw/path_to_lastfm.txt")) {
+read_lastfm = function(path_to_csv = readLines("data-raw/path_to_lastfm.txt")) {
   read.csv(path_to_csv, header = FALSE, col.names = c("artist", "album", "song", "timestamp"), stringsAsFactors = F) %>% 
     mutate(timestamp = dmy_hm(timestamp)) %>% 
     filter(year(timestamp) > 1990) %>% 
@@ -19,4 +19,4 @@ read_lastfm = function(path_to_csv = readlines("data-raw/path_to_lastfm.txt")) {
 
 lastfm = read_lastfm()
 
-save(lastfm, "data/lastfm.rda")
+save(lastfm, file="data/lastfm.rda")

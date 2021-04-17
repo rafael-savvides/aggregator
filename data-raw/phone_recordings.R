@@ -9,7 +9,7 @@ library(lubridate)
 #' @export
 #'
 #' @examples
-read_phone_recordings = function(path_to_dir = readlines("data-raw/path_to_phone_recordings.txt")) {
+read_phone_recordings = function(path_to_dir = readLines("data-raw/path_to_phone_recordings.txt")) {
   get_audio_filenames = function() {list.files(path_to_dir, recursive=TRUE, pattern="\\.mp3$|\\.wav$|\\.m4a$", ignore.case = T)}
   get_audio_filenames() %>% 
     tibble(filename=.) %>% 
@@ -24,4 +24,4 @@ read_phone_recordings = function(path_to_dir = readlines("data-raw/path_to_phone
 
 phone_recordings = read_phone_recordings()
 
-save(phone_recordings, "data/phone_recordings.rda")
+save(phone_recordings, file="data/phone_recordings.rda")

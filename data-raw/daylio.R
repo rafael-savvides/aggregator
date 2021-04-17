@@ -10,7 +10,7 @@ library(tidyr)
 #' @export
 #'
 #' @examples
-read_daylio <- function(path_to_daylio = readlines("data-raw/path_to_daylio.txt"), format = c("long", "wide")) {
+read_daylio <- function(path_to_daylio = readLines("data-raw/path_to_daylio.txt"), format = c("long", "wide")) {
   
   daylio = read.csv(path_to_daylio, stringsAsFactors = FALSE, 
                     fileEncoding="UTF-8-BOM") # Needed else first column has `ï..` prefix. 
@@ -27,4 +27,4 @@ read_daylio <- function(path_to_daylio = readlines("data-raw/path_to_daylio.txt"
 
 daylio = read_daylio()
 
-save(daylio, "data/daylio.rda")
+save(daylio, file="data/daylio.rda")

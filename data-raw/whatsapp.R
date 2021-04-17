@@ -6,7 +6,7 @@
 #' @export
 #'
 #' @examples
-read_whatsapp <- function(path_to_text = readlines("data-raw/path_to_whatsapp.txt")) {
+read_whatsapp <- function(path_to_text = readLines("data-raw/path_to_whatsapp.txt")) {
   raw <- readLines(path_to_text, skip = 3)
   chat <- strsplit(raw, split=" - ") 
   i_remove <- c()
@@ -41,4 +41,4 @@ read_whatsapp <- function(path_to_text = readlines("data-raw/path_to_whatsapp.tx
 
 whatsapp = read_whatsapp()
 
-save(whatsapp, "data/whatsapp.rda")
+save(whatsapp, file="data/whatsapp.rda")

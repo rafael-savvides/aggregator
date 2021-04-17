@@ -8,7 +8,7 @@ library(dplyr)
 #' @export
 #'
 #' @examples
-read_donelist <- function(path_to_donelist = readlines("data-raw/path_to_donelist.txt")) {
+read_donelist <- function(path_to_donelist = readLines("data-raw/path_to_donelist.txt")) {
   donelist = read.csv(path_to_donelist, stringsAsFactors = FALSE) %>% 
     mutate(date = as.Date(paste0(2020, Date), format="%Y%b%d")) %>% 
     select(-Week, -Day, -Date) %>% 
@@ -19,4 +19,4 @@ read_donelist <- function(path_to_donelist = readlines("data-raw/path_to_donelis
 
 donelist = read_donelist()
 
-save(donelist, "data/donelist.rda")
+save(donelist, file="data/donelist.rda")
