@@ -347,7 +347,7 @@ read_lastfm = function(path_to_csv) {
 }
 
 
-#' Title
+#' Read Telegram chats
 #'
 #' @param dir_telegram 
 #'
@@ -409,7 +409,7 @@ read_telegram <- function(dir_telegram) {
     unnest(messages)
 }
 
-#' Title
+#' Read MSN chats
 #'
 #' @param path_to_msn_dir 
 #'
@@ -705,7 +705,7 @@ read_app_usage = function(path_to_app_usage_dir) {
   map_df(files, read_one_app_usage_file)
 }
 
-#' Read Mozzila Firefox history
+#' Read Mozilla Firefox history
 #'
 #' @param path_to_firefox_history_db path to places.sqlite
 #'
