@@ -67,6 +67,7 @@ fig
 ```
 ```{r}
 # plotly::ggplotly(fig)
+ggsave("whatsapp.pdf", fig, width=9, height=13)
 ```
 
 

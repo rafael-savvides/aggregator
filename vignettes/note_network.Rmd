@@ -1,0 +1,31 @@
+---
+title: "R Notebook"
+output: html_notebook
+editor_options: 
+  chunk_output_type: inline
+---
+
+
+```{r}
+library(aggregator)
+library(igraph)
+library(visNetwork)
+g = igraph::graph_from_adjacency_matrix(note_network)
+```
+
+```{r}
+plot(g, layout=layout_with_fr(g))
+# Too much text
+```
+
+```{r}
+heatmap(note_network[,order(rowSums(note_network))])
+# Not all rows are included?
+```
+```{r}
+# Interactive
+visNetwork(data.frame(id=colnames(note_network), 
+                      label=substr(colnames(note_network), 1,15)), 
+           as_data_frame(g))
+```
+

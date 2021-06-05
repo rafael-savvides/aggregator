@@ -1,0 +1,70 @@
+---
+title: "R Notebook"
+date: 2020-06-21
+output: html_notebook
+editor_options: 
+  chunk_output_type: inline
+---
+
+```{r}
+library(aggregator)
+library(DBI)
+library(RSQLite)
+library(dplyr)
+library(tibble)
+library(lubridate)
+library(magrittr)
+library(ggplot2)
+
+amazfit_bip
+```
+
+
+
+```{r}
+amazfit_bip %>% 
+  group_by(date = floor_date(timestamp, "day")) %>% 
+  summarise(avg_raw_kind = mean(raw_kind), 
+            avg_heart_rate = mean(heart_rate, na.rm=TRUE)) %>% 
+  ggplot() + theme_minimal() + 
+  geom_line(aes(date, avg_heart_rate)) +
+  expand_limits(y=c(0, 100)) + 
+  geom_hline(yintercept = 100, lty=2) + 
+  labs(title="Daily average heart rate", 
+       subtitle="60-100 is 'normal'", 
+       x="", y="")
+
+
+```
+
+```{r}
+amazfit_bip  %>% 
+  filter(as.Date(timestamp) == "2020-06-09", 
+         hour(timestamp) > 9) %>% 
+ggplot() + theme_minimal() + 
+  geom_line(aes(timestamp, heart_rate)) + 
+  labs(title="When NAs are removed there isn't much left...")
+```
+
+```{r}
+amazfit_bip %>% 
+  filter(steps != 0) %>% 
+  ggplot() + 
+  geom_histogram(aes(steps)) + 
+  labs(x="Number of 100-steps (?)")
+```
+
+```{r}
+amazfit_bip %>% 
+  filter(year(timestamp) == 2019) %>%
+  # mutate(month_year_num = as.integer(paste0(year(timestamp), month(timestamp))),
+  #        month_year = paste0(month.abb[month(timestamp)], year(timestamp)), 
+  #        month_year = forcats::fct_reorder(month_year, month_year_num))
+  mutate(month_year = month(timestamp, label=TRUE)) %>% 
+  ggplot() + theme_minimal() + 
+  geom_line(aes(timestamp, heart_rate)) + 
+  facet_wrap(~month_year, scales = "free_x") + 
+  labs(title="Heart rate in 2019") + 
+  expand_limits(y=0)
+```
+
