@@ -1,15 +1,18 @@
+
+<!-- README.md is generated from README.Rmd. Please edit that file -->
+
 # aggregator
 
-Reads various personal datasets into a usable format.
+<!-- badges: start -->
+<!-- badges: end -->
 
-Usage: 
+Various personal datasets in a tidy format.
 
-```{r}
-source("scripts/init.R", chdir=T)
+# How to update the data
 
-data_dict
-```
+To add a dataset `x`, create `data-raw/x.R` that exports the data with
+`save(x, "data/x.rda")`. The path to the raw data is in
+`data-raw/path_to_x.txt`.
 
-Details:  
-- Paths to raw data are in text files inside `data/paths_to_raw`
-- Raw data are cleaned and stored in `data/cleaned`. If the raw data have not been modified since the last run, then the stored data are read.
+Run or source `x.R` to create the `.rda` file. Then reinstall the
+package with `devtools::install()`.
