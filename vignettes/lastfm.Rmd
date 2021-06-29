@@ -1,0 +1,70 @@
+---
+title: "R Notebook"
+output: html_notebook
+editor_options: 
+  chunk_output_type: console
+---
+
+
+```{r}
+library(aggregator)
+library(tidyverse)
+theme_set(theme_minimal())
+```
+
+
+I wanted to fit the models
+
+- lastfm duration per day ~ avg_song_duration + number of songs
+- number of artists per day ~ date + duration_per_day
+
+but the data don't have duration..
+
+```{r}
+lastfm = lastfm |> 
+  as_tibble() |> 
+  mutate(date = as.Date(timestamp))
+```
+
+```{r}
+by_date_artist = lastfm |> 
+  select(date, artist) |> 
+  group_by(date) |> 
+  summarize(n_artists = length(unique(artist)), 
+            n = n(),
+            artist=artist, 
+            .groups="drop"
+            ) |> 
+  mutate(artist = fct_lump_min(artist, 20), 
+         artist = fct_relevel(artist, "Other"))
+
+by_date_artist
+```
+
+Fit a model `number of songs listened in a day ~ year + number of artists in a day + artist`
+
+- Lumped non-frequent artists to Other
+- Model coefficients of artists are relative to Other
+- artist coefficient interpretation ~= how many songs more are played in a day compared to when artists in Other are played
+
+```{r}
+library(broom)
+
+lastfm_lm = by_date_artist |> 
+  mutate(year = lubridate::year(date)) |> 
+  select(year, everything(), -date) %>% 
+  lm(n ~ ., data=.)
+
+lastfm_lm_tidy = tidy(lastfm_lm, conf.int = TRUE) |> 
+  mutate(term = str_remove(term, "^artist"), 
+         term = fct_reorder(term, estimate)) |> 
+  filter(term != "(Intercept)")
+
+lastfm_lm_tidy |> 
+  filter(conf.low*conf.high > 0) |> # Both positive or both negative == no overlap with zero
+  ggplot() + 
+  geom_point(aes(estimate, term)) + 
+  geom_errorbarh(aes(xmin=conf.low, xmax=conf.high, y=term)) + 
+  theme(axis.text.y=element_text(size=6))
+```
+

@@ -1,0 +1,56 @@
+---
+title: "R Notebook"
+output: html_notebook
+editor_options: 
+  chunk_output_type: console
+---
+
+```{r}
+library(aggregator)
+library(tidyverse)
+
+dota_matches |> 
+  as_tibble()
+```
+
+# Winrate
+
+By hero
+
+```{r}
+# Beta prior. Can fit empirical Bayes estimate with mle.
+alpha0 = 1
+beta0 = 1
+
+winrates = dota_matches |> 
+  select(hero, result) |> 
+  group_by(hero) |> 
+  summarize(wr = mean(result=="Won Match"), 
+            n = n(), 
+            n_wins = sum(result=="Won Match"), 
+            .groups="drop") |> 
+  # Shrink estimates with BetaBinomial
+  mutate(alpha0 = alpha0, 
+         beta0 = beta0, 
+         alpha = alpha0 + n_wins, 
+         beta = beta0 + n - n_wins, 
+         wr_shrunk = alpha / (alpha + beta), 
+         wr_low = qbeta(0.25, alpha, beta), 
+         wr_high = qbeta(0.75, alpha, beta))
+  
+winrates |> 
+  mutate(hero = fct_reorder(hero, wr)) |> 
+  ggplot() + 
+  geom_point(aes(wr, hero)) + 
+  labs(y="", x="Winrate (naive)")
+
+winrates |> 
+  mutate(hero = fct_reorder(hero, wr_shrunk)) |> 
+  ggplot() + 
+  geom_point(aes(wr_shrunk, hero)) + 
+  geom_errorbarh(aes(xmin=wr_low, xmax=wr_high, y=hero)) + 
+  xlim(0,1) + 
+  labs(y="", x="Winrate (shrunk)")
+```
+
+
