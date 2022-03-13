@@ -7,12 +7,11 @@ editor_options:
 
 
 ```{r}
-suppressPackageStartupMessages(source("../scripts/init.R", chdir=TRUE))
+library(aggregator)
 library(ggplot2)
+library(dplyr)
 
-daylio = load_("daylio", data_dict)
-
-daylio %>% 
+fig = daylio %>% 
   mutate(timestamp = as.POSIXct(timestamp), 
          activities = forcats::fct_reorder(activities, timestamp, length)) %>% 
   ggplot() + theme_minimal() + 
@@ -22,6 +21,18 @@ daylio %>%
   scale_x_datetime(date_breaks = "1 month", date_labels = "%b\n%Y", name="") +
   labs(y="", title="Daylio activities", subtitle="Sorted by most frequent")
 
+fig
+```
 
+```{r}
+
+daylio |> 
+  group_by(year = lubridate::year(timestamp)) |> 
+  count(activities) |> 
+  top_n(10) |> 
+  mutate(activities = tidytext::reorder_within(activities, n, year)) |> 
+  ggplot() + 
+  geom_col(aes(n, activities)) + 
+  facet_wrap(~year, scales="free_y")
 ```
 

@@ -1,0 +1,80 @@
+---
+title: "R Notebook"
+output: html_notebook
+editor_options: 
+  chunk_output_type: inline
+---
+
+```{r}
+library(aggregator)
+library(tidyverse)
+library(plotly)
+theme_set(theme_minimal())
+
+app_usage = app_usage |> 
+  mutate(date = as.Date(timestamp)) |> 
+  filter(!str_detect(app, "^Activity history|^Created by App Usage")) #TODO Delete ~20 wrong rows (e.g. Activity history, April 15, 2020 - April 3, 2020. and Created by App Usage on Friday, April 3, 2020, 09:46).
+
+by_date = app_usage |> 
+  group_by(date, app) |> 
+  summarize(duration = sum(duration), .groups = "drop") |> 
+  pivot_wider(names_from="app", values_from="duration", values_fill=0)
+```
+
+app usage time per day ~ app0-1 
+
+```{r}
+by_date |> 
+  mutate(total_duration = rowSums(by_date[-1]))
+
+
+lm_daily = app_usage |> 
+  filter(!str_detect(app, "Screen off")) |> 
+  group_by(date) |> 
+  mutate(daily_duration = sum(duration) / 60, 
+         app=as.factor(app)) |> 
+  select(date, daily_duration, app) |> 
+  lm(formula=daily_duration ~ app-1)
+
+plot_lm_coeff = function(m) {
+  m |> 
+    broom::tidy(conf.int=TRUE) |> 
+    mutate(term = str_remove(term, "^app"), 
+           term = fct_reorder(term, estimate)) |> 
+    filter(term != "(Intercept)") |> 
+    ggplot() + 
+    geom_point(aes(x=estimate, y=term)) + 
+    geom_errorbarh(aes(xmin=conf.low, xmax=conf.high, y=term)) + 
+    labs(y="")
+}
+
+fig_lm_daily = lm_daily |> 
+  plot_lm_coeff() + 
+  labs(x = "lm coefficient (minutes of total daily usage compared to average)") 
+
+fig_lm_daily
+#ggplotly(fig_lm_daily) # Interactive but no error bars
+```
+
+
+duration_per_app + nb_open_apps
+
+```{r}
+
+```
+
+
+nb_screen_on per day ~ app
+
+```{r}
+screen_on = app_usage |> 
+  group_by(date) |> 
+  mutate(nb_screen_on = sum(str_detect(app, "Screen on"))) |> 
+  select(date, app, nb_screen_on) |> 
+  unique()
+
+lm_screen_on = lm(nb_screen_on ~ app-1, data=screen_on)
+
+plot_lm_coeff(lm_screen_on)
+```
+

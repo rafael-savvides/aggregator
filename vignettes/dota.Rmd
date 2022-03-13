@@ -35,8 +35,8 @@ winrates = dota_matches |>
          alpha = alpha0 + n_wins, 
          beta = beta0 + n - n_wins, 
          wr_shrunk = alpha / (alpha + beta), 
-         wr_low = qbeta(0.25, alpha, beta), 
-         wr_high = qbeta(0.75, alpha, beta))
+         wr_low = qbeta(0.05, alpha, beta), 
+         wr_high = qbeta(0.95, alpha, beta))
   
 winrates |> 
   mutate(hero = fct_reorder(hero, wr)) |> 
