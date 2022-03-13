@@ -20,11 +20,13 @@ read_app_usage = function(path_to_app_usage_dir = readLines("data-raw/path_to_ap
       as_tibble() %>% 
       mutate(timestamp = strptime(paste(Date, Time), format="%m/%d/%y %H:%M:%S"), 
              duration = map_dbl(Duration, make_secs)) %>% 
-      select(app=App.name, timestamp, duration)
+      select(timestamp, app=App.name, duration)
   }
 
   files = list.files(path_to_app_usage_dir, full.names = TRUE)
-  map_df(files, read_one_app_usage_file)
+  map_df(files, read_one_app_usage_file) |> 
+    distinct() |> 
+    arrange(timestamp)
 }
 
 app_usage = read_app_usage()

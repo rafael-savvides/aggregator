@@ -27,5 +27,8 @@ read_activity_watch_afk <- function(path_to_json = readLines("data-raw/path_to_a
 }
 
 activity_watch_afk = read_activity_watch_afk()
-
 save(activity_watch_afk, file="data/activity_watch_afk.rda")
+
+
+activity_watch_work_afk = read_activity_watch_afk(path_to_json=readLines("data-raw/path_to_activity_watch_work.txt"))
+save(activity_watch_work_afk, file="data/activity_watch_work_afk.rda")
