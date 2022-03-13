@@ -1,0 +1,71 @@
+---
+title: "R Notebook"
+output: html_notebook
+editor_options: 
+  chunk_output_type: inline
+---
+
+
+```{r}
+library(aggregator)
+library(tidyverse)
+library(lubridate)
+library(plotly)
+theme_set(theme_minimal())
+phone = app_usage |> 
+  mutate(date = date(timestamp)) |> 
+  filter(!str_detect(app, "Screen off"), 
+         !str_detect(app, "Screen on"), 
+         !(app=="Daylio" & duration > 3000), 
+         duration < 10000) |> 
+  group_by(date) |> 
+  summarize(duration = sum(duration)) |> 
+  mutate(screen = "phone")
+
+laptop = activity_watch_afk |> 
+  mutate(date = date(timestamp)) |> 
+  filter(status == "not-afk") |> 
+  group_by(date) |> 
+  summarize(duration = sum(duration)) |> 
+  mutate(screen = "laptop")
+
+laptop_work = activity_watch_work_afk |> 
+  mutate(date = date(timestamp)) |> 
+  filter(status == "not-afk", date != "2019-01-01") |> 
+  group_by(date) |> 
+  summarize(duration = sum(duration)) |> 
+  mutate(screen = "laptop_work")
+
+screen_time = rbind(phone, laptop, laptop_work) |> arrange(date)
+by_month = screen_time |> 
+  group_by(year = year(date), 
+           month = month(date), screen) |> 
+  summarize(duration = sum(duration))
+
+```
+
+```{r}
+fig = screen_time  |> 
+  mutate(duration = duration / 3600) |> 
+  ggplot() + 
+  aes(x=date, y=duration) + 
+  geom_col(aes(fill=screen)) + 
+  ylim(c(0, 24)) +
+  geom_smooth(aes(group=screen, col=screen))
+fig
+
+ggplotly(fig)
+```
+
+```{r}
+fig_monthly = by_month |> 
+  mutate(date = date(paste0(year, "-", month, "-01")), 
+         duration = duration/3600) |> 
+  ggplot() + 
+  aes(x=date, y=duration) + 
+  geom_col(aes(fill=screen)) + 
+  ylim(c(0, 24*31))
+
+fig_monthly
+```
+
