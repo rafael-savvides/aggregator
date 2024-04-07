@@ -13,14 +13,14 @@ library(tidyr)
 #' @examples
 read_firefox_history <- function(path_to_firefox_history_db = readLines("data-raw/path_to_firefox_history.txt")) {
   con = DBI::dbConnect(RSQLite::SQLite(), path_to_firefox_history_db)
-  history = dbReadTable(con, "moz_historyvisits") %>% 
+  history = dbReadTable(con, "moz_historyvisits") |> 
     as_tibble()
   
-  places = dbReadTable(con, "moz_places") %>% 
+  places = dbReadTable(con, "moz_places") |> 
     as_tibble()
   
-  df = left_join(history, places, by=c("place_id"="id")) %>% 
-    select(place_id, visit_date, url, title, origin_id, visit_count) %>% 
+  df = left_join(history, places, by=c("place_id"="id")) |> 
+    select(place_id, visit_date, url, title, origin_id, visit_count) |> 
     # UNIX timestamp is in microseconds
     mutate(visit_date = as.POSIXct(visit_date / 1e6, origin="1970-01-01"), 
            domain = urltools::domain(url), 

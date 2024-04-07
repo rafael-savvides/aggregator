@@ -31,16 +31,16 @@ read_work_diaries = function(paths = readLines("data-raw/paths_to_work_diaries.t
 #'
 #' @examples
 read_work_diary_tasks <- function(path_to_work_diary, year = 2020) {
- work_diary = read.csv(path_to_work_diary, skip=1, colClasses="character") %>% 
-   as_tibble() %>% 
-   pivot_longer(-1, names_to = "date") %>% 
-   mutate(date = as.Date(paste0(year, date), format = "%Y%b.%d")) %>% 
-   select(date, everything()) %>% 
+ work_diary = read.csv(path_to_work_diary, skip=1, colClasses="character") |> 
+   as_tibble() |> 
+   pivot_longer(-1, names_to = "date") |> 
+   mutate(date = as.Date(paste0(year, date), format = "%Y%b.%d")) |> 
+   select(date, everything()) |> 
    arrange(date)
    
- work_tasks = work_diary %>% 
-   filter(str_detect(X, "^\\d\\d?:\\d\\d") | str_detect(X, "^Extra hours")) %>% 
-   rename(time = X) %>%
+ work_tasks = work_diary |> 
+   filter(str_detect(X, "^\\d\\d?:\\d\\d") | str_detect(X, "^Extra hours")) |> 
+   rename(time = X) |>
    mutate(time = process_time(time))
  
  arrange(work_tasks, date, time)

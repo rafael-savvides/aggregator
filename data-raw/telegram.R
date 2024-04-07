@@ -35,23 +35,23 @@ read_telegram <- function(dir_telegram = readLines("data-raw/path_to_telegram.tx
       }
     }
     x = tibble(chat = x)
-    x_df = x %>% 
+    x_df = x |> 
       unnest_wider(chat) 
-    x_df = x_df %>% 
-      filter(type == "message") %>% 
+    x_df = x_df |> 
+      filter(type == "message") |> 
       select(-intersect(colnames(x_df), 
                         c("type","from_id","file","thumbnail","sticker_emoji",
                           "width","height","photo","actor","actor_id","action",
                           "discard_reason","location_information",
                           "live_location_period_seconds","duration_seconds",
                           "via_bot","media_type", "members", "title", "inviter", 
-                          "place_name", "address", "message_id"))) %>% 
-      select(from, text, date, edited, id, everything()) %>% 
-      mutate(text = map_chr(text, parse_message)) %>% 
+                          "place_name", "address", "message_id"))) |> 
+      select(from, text, date, edited, id, everything()) |> 
+      mutate(text = map_chr(text, parse_message)) |> 
       replace_na(list(mime_type="", 
                       forwarded_from=""))
     if ("mime_type" %in% colnames(x_df)) {
-      x_df = x_df %>% 
+      x_df = x_df |> 
         mutate(text = ifelse(mime_type=="", # may need to be mutate(content = ...)
                              text, 
                              paste0(ifelse(text=="", text, paste0(text, " \n")), 
@@ -60,8 +60,8 @@ read_telegram <- function(dir_telegram = readLines("data-raw/path_to_telegram.tx
     } 
     x_df
   }
-  df %>% 
-    mutate(messages = map(messages, parse_chat)) %>% 
+  df |> 
+    mutate(messages = map(messages, parse_chat)) |> 
     unnest(messages)
 }
 

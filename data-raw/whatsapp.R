@@ -20,10 +20,10 @@ read_whatsapp <- function(path_to_text = readLines("data-raw/path_to_whatsapp.tx
     }
   }
   
-  chat <- chat[-i_remove] %>% 
-    unlist %>% 
-    matrix(ncol=2, byrow = T, dimnames = list(NULL, c("timestamp", "message"))) %>% 
-    data.frame(stringsAsFactors = F) %>% 
+  chat <- chat[-i_remove] |> 
+    unlist |> 
+    matrix(ncol=2, byrow = T, dimnames = list(NULL, c("timestamp", "message"))) |> 
+    data.frame(stringsAsFactors = F) |> 
     tbl_df()
   chat$timestamp <- as.POSIXlt(chat$timestamp, format="%m/%d/%Y, %H:%M")
   chat$timestamp$year <- chat$timestamp$year + 2000

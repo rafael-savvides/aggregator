@@ -7,13 +7,12 @@ library(lubridate)
 #' @param path_to_json 
 #'
 #' @return data frame
-#' @importFrom magrittr %>%
 #' @export
 #'
 #' @examples
 read_spotify = function(path_to_json = readLines("data-raw/path_to_spotify.txt")) {
-  read_json(path_to_json, simplifyVector = T) %>% 
-    mutate(endTime = ymd_hm(endTime)) %>% 
+  read_json(path_to_json, simplifyVector = T) |> 
+    mutate(endTime = ymd_hm(endTime)) |> 
     rename(timestamp = endTime, artist = artistName, song = trackName, ms_played = msPlayed)
 }
 

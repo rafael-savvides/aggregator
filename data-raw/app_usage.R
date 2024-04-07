@@ -16,10 +16,10 @@ read_app_usage = function(path_to_app_usage_dir = readLines("data-raw/path_to_ap
     s[1]*3600 + s[2]*60 + s[3]
   }
   read_one_app_usage_file = function(file) {
-    read.csv(file) %>% 
-      as_tibble() %>% 
+    read.csv(file) |> 
+      as_tibble() |> 
       mutate(timestamp = strptime(paste(Date, Time), format="%m/%d/%y %H:%M:%S"), 
-             duration = map_dbl(Duration, make_secs)) %>% 
+             duration = map_dbl(Duration, make_secs)) |> 
       select(timestamp, app=App.name, duration)
   }
 

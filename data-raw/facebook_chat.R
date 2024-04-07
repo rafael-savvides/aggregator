@@ -13,7 +13,7 @@ library(tidyr)
 read_facebook_chat <- function(path_to_fb_dir = readLines("data-raw/path_to_facebook_dir.txt")) {
   parse_messages = function(messages) {
     # messages = fromJSON(fbchat)$messages
-    m = messages %>% 
+    m = messages |> 
       as_tibble() 
     
     if ("call_duration" %in% colnames(m)) {
@@ -24,7 +24,7 @@ read_facebook_chat <- function(path_to_fb_dir = readLines("data-raw/path_to_face
                                    content))
     }
     
-    m %>% 
+    m |> 
       mutate(has_photos = "photos" %in% names(messages) && !map_lgl(photos, is.null), 
              has_link = "link" %in% names(messages) &&  !is.na(share$link), 
              has_reactions = "reactions" %in% names(messages) && 
@@ -34,7 +34,7 @@ read_facebook_chat <- function(path_to_fb_dir = readLines("data-raw/path_to_face
              has_files = "files" %in% names(messages) &&  !map_lgl(files, is.null), 
              has_audio_files = "audio_files" %in% names(messages) && 
                !map_lgl(audio_files, is.null), 
-             has_videos = "videos" %in% names(messages) && !map_lgl(videos, is.null)) %>% 
+             has_videos = "videos" %in% names(messages) && !map_lgl(videos, is.null)) |> 
       mutate(media = case_when(has_photos ~ "photo", 
                                has_link ~ "link",
                                has_gifs ~ "gif",
@@ -43,8 +43,8 @@ read_facebook_chat <- function(path_to_fb_dir = readLines("data-raw/path_to_face
                                has_audio_files ~ "audio", 
                                has_videos ~ "video", 
                                has_reactions ~ "reactions",
-                               TRUE ~ "")) %>% 
-      mutate(timestamp = as.POSIXct(timestamp_ms / 1000, origin="1970-01-01")) %>%  
+                               TRUE ~ "")) |> 
+      mutate(timestamp = as.POSIXct(timestamp_ms / 1000, origin="1970-01-01")) |>  
       # About /1000, see comments in https://stackoverflow.com/questions/13456241/convert-unix-epoch-to-date-object
       #TODO timezone may be off
       select(sender=sender_name, timestamp, content, media) 
@@ -57,10 +57,10 @@ read_facebook_chat <- function(path_to_fb_dir = readLines("data-raw/path_to_face
               chat_path = sapply(fb_chats, function(x) x$thread_path), 
               messages = sapply(fb_chats, function(x) x$messages))
   
-  fb_parsed = fb %>% 
+  fb_parsed = fb |> 
     mutate(messages = map(messages, parse_messages))
   
-  fb_parsed %>% 
+  fb_parsed |> 
     unnest(messages)
 }
 

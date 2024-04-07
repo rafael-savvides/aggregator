@@ -13,14 +13,14 @@ library(tidyr)
 #'
 #' @examples
 read_activity_watch_web <- function(path_to_json = readLines("data-raw/path_to_activity_watch.txt")) {
-    buckets = jsonlite::read_json(path_to_json)[[1]] %>% 
-    tibble(watchers = .) %>% 
+    buckets = jsonlite::read_json(path_to_json)[[1]] |> 
+    tibble(watchers = .) |> 
     unnest_wider(watchers)
-    web = buckets %>% 
-      filter(str_detect(id, "web")) %>% 
-      select(events) %>% 
-      unnest_longer(events) %>% 
-      unnest_wider(events) %>% 
+    web = buckets |> 
+      filter(str_detect(id, "web")) |> 
+      select(events) |> 
+      unnest_longer(events) |> 
+      unnest_wider(events) |> 
       unnest_wider(data)
     web
 }

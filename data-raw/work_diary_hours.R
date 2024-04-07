@@ -34,18 +34,18 @@ read_work_diaries = function(paths = readLines("data-raw/paths_to_work_diaries.t
 #'
 #' @examples
 read_work_diary_hours <- function(path_to_work_diary, year=2020) {
- work_diary = read.csv(path_to_work_diary, skip=1, colClasses = "character") %>% 
-   as_tibble() %>% 
-   pivot_longer(-1, names_to = "date") %>% 
-   mutate(date = as.Date(paste0(year, date), format = "%Y%b.%d")) %>% 
-   select(date, everything()) %>% 
+ work_diary = read.csv(path_to_work_diary, skip=1, colClasses = "character") |> 
+   as_tibble() |> 
+   pivot_longer(-1, names_to = "date") |> 
+   mutate(date = as.Date(paste0(year, date), format = "%Y%b.%d")) |> 
+   select(date, everything()) |> 
    arrange(date)
  
- work_hours = work_diary %>% 
+ work_hours = work_diary |> 
    filter(!str_detect(X, "^\\d\\d?:\\d\\d"), 
           !str_detect(X, "^Extra hours"), 
-          X != "") %>% 
-   pivot_wider(date, X) %>% 
+          X != "") |> 
+   pivot_wider(date, X) |> 
    janitor::clean_names() 
  
  cols = c("date", "start", "finish", "extra", "daily_hrs", "hrs_total", "is_workday")
