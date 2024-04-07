@@ -1,10 +1,4 @@
-
-<!-- README.md is generated from README.Rmd. Please edit that file -->
-
 # aggregator
-
-<!-- badges: start -->
-<!-- badges: end -->
 
 Various personal datasets in a tidy format.
 
