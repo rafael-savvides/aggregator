@@ -10,7 +10,9 @@ library(lubridate)
 #'
 #' @examples
 read_phone_recordings = function(path_to_dir = readLines("data-raw/path_to_phone_recordings.txt")) {
-  get_audio_filenames = function() {list.files(path_to_dir, recursive=TRUE, pattern="\\.mp3$|\\.wav$|\\.m4a$", ignore.case = T)}
+  get_audio_filenames = function() {
+    list.files(path_to_dir, recursive = TRUE, pattern = "\\.mp3$|\\.wav$|\\.m4a$", ignore.case = TRUE)
+  }
   get_audio_filenames() |> 
     tibble(filename=.) |> 
     mutate(phone = map_chr(filename, function(s) str_split(s, "/")[[1]][1])) |> 
