@@ -1,18 +1,28 @@
 library(dplyr)
 library(tidyr)
 
-read_nutrilio = function(path_to_nutrilio = readLines("data-raw/path_to_nutrilio_dir.txt")) {
-  latest_nutrilio = tail(sort(list.files(path_to_nutrilio, pattern="^nutrilio_export", full.names = TRUE)), 1)
+read_nutrilio = function(
+    path_to_nutrilio = readLines("data-raw/path_to_nutrilio_dir.txt"), 
+    entry_columns = c("Where", "Other", "Plants", "Fruit", "Dairy.Eggs", "Carbs", "Meat", "Snacks", "Fast.food", "Type", "Processed", "Note"), 
+    numeric_columns = c("Tastiness", "Amount", "Price....")) {
+  non_empty = function(x) !all(is.na(x)) & !all(x == "")
+  if (dir.exists(path_to_nutrilio)) {
+    latest_nutrilio = tail(sort(list.files(path_to_nutrilio, pattern="^nutrilio_export", full.names = TRUE)), 1)
+  } else if (file.exists(path_to_nutrilio)) {
+    latest_nutrilio = path_to_nutrilio
+  }
   nutrilio = read.csv(latest_nutrilio, stringsAsFactors = FALSE, 
                       fileEncoding="UTF-8-BOM") # Needed else first column has `ï..` prefix. 
+  
   nutrilio |> 
     as_tibble() |> 
-    select(-Date, -Weekday, -Daily.Summary, -`Water..ml.`, -`Weight..kg.`, -Amount, -Health) |> 
-    separate_rows(Food, sep = " \\| ") |> 
-    separate(Food, c("Food", "Portion"), sep=" \\(") |> 
-    mutate(Portion = gsub("×\\)", "", Portion)) |> 
+    pivot_longer(entry_columns, names_to = "category", values_to = "entry") |> 
+    filter(entry != "") |> 
+    separate_rows(entry, sep = " \\| ") |> 
+    separate(entry, c("entry", "portion"), sep=" \\(", fill="right") |> 
+    mutate(portion = gsub("×\\)", "", portion)) |> 
     mutate(timestamp = as.POSIXct(paste(Full.Date, Time))) |> 
-    select(timestamp, food=Food, portion=Portion, note=Note, amount=Amount_text, health=Health_text) 
+    select(timestamp, category, entry, portion, all_of(numeric_columns)) 
 }
 
 nutrilio = read_nutrilio()
