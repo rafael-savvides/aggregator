@@ -1,12 +1,16 @@
 # aggregator
 
-Various personal datasets in a tidy format.
+Functions for reading various personal data.
 
-# How to update the data
+Supports data caching.
 
-To add a dataset `x`, create `data-raw/x.R` that exports the data with
-`save(x, "data/x.rda")`. The path to the raw data is in
-`data-raw/path_to_x.txt`.
+To cache datasets:
 
-Run or source `x.R` to create the `.rda` file. Then reinstall the
-package with `devtools::install()`.
+- `init_config()` creates a config file.
+- `edit_config()` opens the config file to add paths to raw data.
+- `update_cache()` updates cached datasets listed in the config.
+
+To load cached datasets: 
+
+- `load_data(name)` loads the cached dataset `name` 
+- `available_data()` shows all cached datasets
