@@ -10,12 +10,8 @@ library(lubridate)
 #' @export
 #'
 #' @examples
-read_spotify = function(path_to_json = readLines("data-raw/path_to_spotify.txt")) {
+read_spotify = function(path_to_json) {
   read_json(path_to_json, simplifyVector = TRUE) |> 
     mutate(endTime = ymd_hm(endTime)) |> 
     rename(timestamp = endTime, artist = artistName, song = trackName, ms_played = msPlayed)
 }
-
-spotify = read_spotify()
-
-save(spotify, file="data/spotify.rda")

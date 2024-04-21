@@ -11,7 +11,7 @@ library(dplyr)
 #' @export
 #'
 #' @examples
-read_amazfit_bip <- function(path_to_db = readLines("data-raw/path_to_amazfit_bip.txt")) {
+read_amazfit_bip <- function(path_to_db) {
   con = dbConnect(SQLite(), path_to_db)
   tbl = dbReadTable(con, "MI_BAND_ACTIVITY_SAMPLE") |> 
     as_tibble() |> 
@@ -24,6 +24,3 @@ read_amazfit_bip <- function(path_to_db = readLines("data-raw/path_to_amazfit_bi
   dbDisconnect(con)
   tbl
 }
-amazfit_bip = read_amazfit_bip()
-
-save(amazfit_bip, file="data/amazfit_bip.rda")

@@ -2,7 +2,7 @@ library(dplyr)
 library(tidyr)
 
 read_nutrilio = function(
-    path_to_nutrilio = readLines("data-raw/path_to_nutrilio_dir.txt"), 
+    path_to_nutrilio, 
     entry_columns = c("Where", "Other", "Plants", "Fruit", "Dairy.Eggs", "Carbs", "Meat", "Snacks", "Fast.food", "Type", "Processed", "Note"), 
     numeric_columns = c("Tastiness", "Amount", "Price....")) {
   non_empty = function(x) !all(is.na(x)) & !all(x == "")
@@ -24,7 +24,3 @@ read_nutrilio = function(
     mutate(timestamp = as.POSIXct(paste(Full.Date, Time))) |> 
     select(timestamp, category, entry, portion, all_of(numeric_columns)) 
 }
-
-nutrilio = read_nutrilio()
-
-save(nutrilio, file="data/nutrilio.rda")

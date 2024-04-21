@@ -11,7 +11,7 @@ library(purrr)
 #' @export
 #'
 #' @examples
-read_telegram <- function(dir_telegram = readLines("data-raw/path_to_telegram.txt")) {
+read_telegram <- function(dir_telegram) {
   json = read_json(dir_telegram)
   chats = json$chats$list
   df = tibble(chat = sapply(chats, function(x) {if (is.null(x$name)) NA_character_ else x$name}), 
@@ -64,7 +64,3 @@ read_telegram <- function(dir_telegram = readLines("data-raw/path_to_telegram.tx
     mutate(messages = map(messages, parse_chat)) |> 
     unnest(messages)
 }
-
-telegram = read_telegram()
-
-save(telegram, file="data/telegram.rda")

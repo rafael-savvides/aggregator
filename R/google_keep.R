@@ -10,7 +10,7 @@ library(purrr)
 #' @export
 #'
 #' @examples
-read_google_keep <- function(dir_google_keep = readLines("data-raw/path_to_google_keep_dir.txt")) {
+read_google_keep <- function(dir_google_keep) {
   parse_checklist = function(x) {
     if (is.null(x) || is.na(x))
       return("")
@@ -51,7 +51,3 @@ read_google_keep <- function(dir_google_keep = readLines("data-raw/path_to_googl
   
   df
 }
-
-google_keep = read_google_keep()
-
-save(google_keep, file="data/google_keep.rda")

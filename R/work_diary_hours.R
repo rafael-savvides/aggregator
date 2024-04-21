@@ -14,7 +14,7 @@ library(janitor)
 #' @export
 #'
 #' @examples
-read_work_diaries = function(paths = readLines("data-raw/paths_to_work_diaries.txt"), read) {
+read_work_diaries = function(paths, read) {
   regex_4digit_number = function(x) regmatches(x, regexpr("\\d\\d\\d\\d", x))
   years = sapply(basename(paths), regex_4digit_number)
   
@@ -54,7 +54,3 @@ read_work_diary_hours <- function(path_to_work_diary, year=2020) {
  
  work_hours[,cols]
 }
-
-work_diary_hours = read_work_diaries(read=read_work_diary_hours)
-
-save(work_diary_hours, file="data/work_diary_hours.rda")

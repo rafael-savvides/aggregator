@@ -10,7 +10,7 @@ library(tidyr)
 #' @export
 #'
 #' @examples
-read_facebook_chat <- function(path_to_fb_dir = readLines("data-raw/path_to_facebook_dir.txt")) {
+read_facebook_chat <- function(path_to_fb_dir) {
   parse_messages = function(messages) {
     # messages = fromJSON(fbchat)$messages
     m = messages |> 
@@ -63,7 +63,3 @@ read_facebook_chat <- function(path_to_fb_dir = readLines("data-raw/path_to_face
   fb_parsed |> 
     unnest(messages)
 }
-
-facebook_chat = read_facebook_chat()
-
-save(facebook_chat, file="data/facebook_chat.rda")

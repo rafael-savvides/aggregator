@@ -12,7 +12,7 @@ library(stringr)
 #' @export
 #'
 #' @examples
-read_work_diaries = function(paths = readLines("data-raw/paths_to_work_diaries.txt"), read) {
+read_work_diaries = function(paths, read) {
   regex_4digit_number = function(x) regmatches(x, regexpr("\\d\\d\\d\\d", x))
   years = sapply(basename(paths), regex_4digit_number)
   
@@ -56,7 +56,3 @@ process_time = function(time) {
   time = factor(time, ordered = TRUE)
   time
 }
-
-work_diary_tasks = read_work_diaries(read=read_work_diary_tasks)
-
-save(work_diary_tasks, file="data/work_diary_tasks.rda")

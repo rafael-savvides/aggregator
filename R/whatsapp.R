@@ -6,7 +6,7 @@
 #' @export
 #'
 #' @examples
-read_whatsapp <- function(path_to_text = readLines("data-raw/path_to_whatsapp.txt")) {
+read_whatsapp <- function(path_to_text) {
   raw <- readLines(path_to_text, skip = 3)
   chat <- strsplit(raw, split=" - ") 
   i_remove <- c()
@@ -21,7 +21,7 @@ read_whatsapp <- function(path_to_text = readLines("data-raw/path_to_whatsapp.tx
   }
   
   chat <- chat[-i_remove] |> 
-    unlist |> 
+    unlist() |> 
     matrix(ncol=2, byrow = TRUE, dimnames = list(NULL, c("timestamp", "message"))) |> 
     data.frame(stringsAsFactors = F) |> 
     tbl_df()
@@ -38,7 +38,3 @@ read_whatsapp <- function(path_to_text = readLines("data-raw/path_to_whatsapp.tx
   chat$message <- sapply(str_split(chat$message, ":", n=2), function(x) x[2])
   chat
 }
-
-whatsapp = read_whatsapp()
-
-save(whatsapp, file="data/whatsapp.rda")

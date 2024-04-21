@@ -3,7 +3,7 @@ library(dplyr)
 library(lubridate)
 library(jsonlite)
 
-read_youtube_history = function(path_to_youtube_history = "data-raw/path_to_youtube_history.txt") {
+read_youtube_history = function(path_to_youtube_history) {
   youtube_raw = fromJSON(readLines(path_to_youtube_history))
   youtube_raw |> 
     unnest(subtitles, keep_empty=T) |> 
@@ -15,8 +15,3 @@ read_youtube_history = function(path_to_youtube_history = "data-raw/path_to_yout
     mutate(channel_unique_videos = length(unique(title))) |> 
     ungroup()
 }
-
-youtube_history = read_youtube_history()
-
-save(youtube_history, file="data/youtube_history.rda")
-

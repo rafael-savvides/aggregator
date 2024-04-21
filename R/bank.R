@@ -12,7 +12,7 @@ library(stringr)
 #' @export
 #'
 #' @examples
-read_bank <- function(path_to_bank_dir = readLines("data-raw/path_to_bank_dir.txt")) {
+read_bank <- function(path_to_bank_dir) {
   danske_files = list.files(path_to_bank_dir, "danske.+\\.csv", full.names = TRUE)
   spankki_files = list.files(path_to_bank_dir, "spankki.+\\.csv", full.names = TRUE)
   danske = map_df(danske_files, read_danske) |> 
@@ -73,8 +73,3 @@ read_danske <- function(path_to_csv) {
     select(date,  amount, receiver, payer) |>
     mutate(receiver = str_replace(receiver, " +\\)\\)\\)\\)", ""))
 }
-
-
-bank = read_bank()
-
-save(bank, file="data/bank.rda")

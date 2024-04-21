@@ -9,7 +9,7 @@ library(lubridate)
 #' @export
 #'
 #' @examples
-read_phone_recordings = function(path_to_dir = readLines("data-raw/path_to_phone_recordings.txt")) {
+read_phone_recordings = function(path_to_dir) {
   get_audio_filenames = function() {
     list.files(path_to_dir, recursive = TRUE, pattern = "\\.mp3$|\\.wav$|\\.m4a$", ignore.case = TRUE)
   }
@@ -23,7 +23,3 @@ read_phone_recordings = function(path_to_dir = readLines("data-raw/path_to_phone
            abs_filename = file.path(path_to_dir, filename)) |> # 1 fails to parse, it has some text
     select(file, phone, timestamp, abs_filename)
 }
-
-phone_recordings = read_phone_recordings()
-
-save(phone_recordings, file="data/phone_recordings.rda")

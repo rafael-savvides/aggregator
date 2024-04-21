@@ -17,7 +17,7 @@ library(purrr)
 #' @examples
 #' clippings = read_kindle_clippings("Clippings.txt")
 #' print_clippings(clippings, "Thinking, Fast and Slow")
-read_kindle_clippings <- function(path_to_txt = readLines("data-raw/path_to_kindle_clippings.txt")) {
+read_kindle_clippings <- function(path_to_txt) {
   clippings_raw = readLines(path_to_txt, encoding = "UTF-8")
   
   clippings = data.frame(raw = clippings_raw, stringsAsFactors = F) |> 
@@ -49,7 +49,3 @@ read_kindle_clippings <- function(path_to_txt = readLines("data-raw/path_to_kind
     filter(!lead(str_detect(body, fixed(lag(body))))) # Almost duplicates from when a passage is re-highlighted.
   clippings
 }
-
-kindle_clippings = read_kindle_clippings()
-
-save(kindle_clippings, file="data/kindle_clippings.rda")
