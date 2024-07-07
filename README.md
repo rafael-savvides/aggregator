@@ -1,13 +1,10 @@
 # aggregator
 
-Functions for reading various personal data.
+R package for reading various personal datasets. To install, run `devtools::install()` in its directory. 
 
-Supports data caching.
+Supports data caching. 
 
-To cache datasets:
-
-- `init_config()` creates a config file.
-- `edit_config()` opens the config file to add paths to raw data.
+- `init_config()` initializes a config json file for adding paths to datasets and adds its path to an environment variable.
 - `update_cache()` updates cached datasets listed in the config.
 
 To load cached datasets: 
