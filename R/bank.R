@@ -15,12 +15,20 @@ library(stringr)
 read_bank <- function(path_to_bank_dir) {
   danske_files = list.files(path_to_bank_dir, "danske.+\\.csv", full.names = TRUE)
   spankki_files = list.files(path_to_bank_dir, "spankki.+\\.csv", full.names = TRUE)
+  spankki2_files = list.files(path_to_bank_dir, "spankki_s.+\\.csv", full.names = TRUE)
   danske = map_df(danske_files, read_danske) |> 
-    mutate(bank = "Danske")
+    mutate(account = "Danske")
   spankki = map_df(spankki_files, read_spankki)|> 
-    mutate(bank = "S-Bank")
+    mutate(account = "S-Bank")
+  spankki2 = map_df(spankki2_files, read_spankki)|> 
+    mutate(account = "S-Bank2")
   bank = full_join(danske, spankki) |> 
-    select(-bank, everything(), bank) |> 
+    full_join(spankki2) |> 
+    mutate(
+      receiver = ifelse(tolower(receiver) == "savvides rafael", "rafael savvides", receiver),
+      payer = ifelse(tolower(payer) == "savvides rafael", "rafael savvides", payer)
+    ) |> 
+    select(everything(), account) |> 
     arrange(desc(date))
   bank
 }
