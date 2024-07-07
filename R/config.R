@@ -29,7 +29,7 @@ init_config = function(config_path = get_config_path()) {
 #' @param path path to config file
 load_config = function(config_path = get_config_path()) {
   if (is.null(config_path)) {
-    stop("")
+    stop("config_path is NULL. Run init_config().")
   }
   jsonlite::read_json(config_path)
 }
@@ -50,7 +50,7 @@ get_config_path = function() {
   if (is.null(path) | path == "") {
     path = getOption("aggregator.config_path")
   }
-  if (path == "") {
+  if (!is.null(path) && path == "") {
     path = NULL
   }
   path
