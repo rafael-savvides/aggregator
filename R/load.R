@@ -70,11 +70,11 @@ load_data = function(name = "") {
 #' @param datasets_to_update 
 #'
 #' @export
-update_cache = function(datasets_to_update = "") {
+update_cache = function(datasets_to_update = "", force_overwrite=FALSE) {
   update_dataset = function(path_raw, read_fn, path_cached) {
     not_cached = !file.exists(path_cached)
     raw_updated = file.mtime(path_raw) > file.mtime(path_cached)
-    if (not_cached || raw_updated) {
+    if (not_cached || raw_updated || force_overwrite) {
       #TODO Check what should happen when path is not a file.
       df = read_fn(path_raw)
       if (!dir.exists(dirname(path_cached))) {
