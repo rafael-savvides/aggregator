@@ -1,6 +1,8 @@
 # aggregator
 
-R package for reading various personal datasets. To install, run `devtools::install()` in its directory. 
+R package for reading various personal datasets. 
+
+To install, run `R -e "devtools::install()` in its directory. 
 
 Supports data caching. 
 
