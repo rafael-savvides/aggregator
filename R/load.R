@@ -1,4 +1,3 @@
-
 #' List of available functions for reading data
 #' @export
 available_fns = function() {
@@ -12,7 +11,6 @@ available_fns = function() {
     bank = read_bank,
     daylio = read_daylio,
     donelist = read_donelist,
-    dota_matches = read_dota_matches,
     facebook_chat = read_facebook_chat,
     firefox_history = read_firefox_history,
     google_keep = read_google_keep,
@@ -40,7 +38,7 @@ available_data = function() {
 
 #' Load cached dataset
 #'
-#' @param name 
+#' @param name
 #'
 #' @export
 load_data = function(name = "") {
@@ -48,7 +46,7 @@ load_data = function(name = "") {
   cache_path = config$cache_path
   if (name == "") {
     cached_files = list.files(cache_path)
-    if (length(cached_files) == 0 ) {
+    if (length(cached_files) == 0) {
       print("Cache is empty.")
     } else {
       print("Cached datasets: ")
@@ -67,20 +65,20 @@ load_data = function(name = "") {
 
 #' Update cache for datasets
 #'
-#' @param datasets_to_update 
+#' @param datasets_to_update
 #'
 #' @export
-update_cache = function(datasets_to_update = "", force_overwrite=FALSE) {
+update_cache = function(datasets_to_update = "", force_overwrite = FALSE) {
   update_dataset = function(path_raw, read_fn, path_cached) {
     not_cached = !file.exists(path_cached)
     raw_updated = file.mtime(path_raw) > file.mtime(path_cached)
     if (not_cached || raw_updated || force_overwrite) {
-      #TODO Check what should happen when path is not a file.
+      # TODO Check what should happen when path is not a file.
       df = read_fn(path_raw)
       if (!dir.exists(dirname(path_cached))) {
-        dir.create(dirname(path_cached), recursive=TRUE)
+        dir.create(dirname(path_cached), recursive = TRUE)
       }
-      saveRDS(df, file=path_cached)
+      saveRDS(df, file = path_cached)
       cat(sprintf("Cached to %s.", path_cached))
     } else {
       cat(sprintf("Already cached at %s.", path_cached))
